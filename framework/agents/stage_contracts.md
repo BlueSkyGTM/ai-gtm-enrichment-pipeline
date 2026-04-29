@@ -63,9 +63,9 @@ Neptune only runs if Nemo returns `status: ENRICHED`. SHIPWRECKED leads go to `f
 
 ---
 
-## Nemo → Neptune Formatter (n8n Function Node)
+## Nemo → Neptune: Sparrow (Handoff Layer)
 
-**This is not an agent.** It is a deterministic Function node in the n8n workflow.
+**Sparrow is not an agent, not an AI call, and not a formatter. It is a deterministic JavaScript Code node — pure software. It governs what Neptune receives by stripping Nemo's full enrichment output down to the exact six typed fields the copy formula requires. No tokens. No inference. No variation. Same input always produces same output.**
 Zero tokens. Zero hallucination risk. One job: translate Nemo's full Enriched_Lead
 into the minimal brief Neptune needs to execute the formula.
 
