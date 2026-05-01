@@ -77,12 +77,12 @@ into the minimal brief Neptune needs to execute the formula.
 **Output:** Minimal Neptune brief
 
 {
-  "Company_Name": "{{ $json.Enriched_Lead.Company_Name }}",
+  "company_name": "{{ $json.Enriched_Lead.Company_Name }}",
   "friction_type": "{{ $json.Enriched_Lead.friction_type }}",
   "funding_signal": "{{ $json.Enriched_Lead.funding_signal ?? null }}",
   "primary_signal": "{{ $json.Enriched_Lead.Primary_Stack[0] ?? null }}",
-  "Contact_Recon": "{{ $json.Enriched_Lead.Contact_Recon }}",
-  "Target_Service_Intent": "{{ $json.Enriched_Lead.Target_Service_Intent }}"
+  "contact_recon": "{{ $json.Enriched_Lead.Contact_Recon }}",
+  "target_service_intent": "{{ $json.Enriched_Lead.Target_Service_Intent }}"
 }
 
 **Rules:**
