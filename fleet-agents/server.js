@@ -50,6 +50,11 @@ async function callGenerateContent(model, body) {
   try {
     return JSON.parse(cleaned);
   } catch {
+    // Second attempt: extract first complete JSON object
+    try {
+      const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
+      if (jsonMatch) return JSON.parse(jsonMatch[0]);
+    } catch {}
     return { raw };
   }
 }
@@ -57,7 +62,7 @@ async function callGenerateContent(model, body) {
 function extractFrictionType(payload) {
   const lead = payload?.Enriched_Lead || payload || {};
   const divers = lead.The_Divers || payload?.The_Divers || {};
-
+  
   // Potential sources in order of reliability
   const candidates = [
     lead.Forensic_Friction_Type,
@@ -67,9 +72,9 @@ function extractFrictionType(payload) {
   ];
 
   const forensicTerms = [
-    'API Stutter',
-    'Scale Friction',
-    'Manual Data Debt',
+    'API Stutter', 
+    'Scale Friction', 
+    'Manual Data Debt', 
     'Displacement Signal'
   ];
 
@@ -77,14 +82,14 @@ function extractFrictionType(payload) {
 
   for (const val of candidates) {
     if (typeof val !== 'string') continue;
-
+    
     // Check for exact forensic terms within the string
     const found = forensicTerms.find(term => val.toLowerCase().includes(term.toLowerCase()));
     if (found) return found;
 
     // If it's just a service intent, ignore it to prevent "GTM" contamination
     if (serviceIntents.some(intent => val.trim().toUpperCase() === intent)) continue;
-
+    
     // Fallback: if it's one of the forensic terms exactly
     if (forensicTerms.includes(val.trim())) return val.trim();
   }
@@ -92,27 +97,43 @@ function extractFrictionType(payload) {
   return null;
 }
 
+function extractFundingSignal(payload) {
+  if (payload?.Enriched_Lead?.funding_signal) return payload.Enriched_Lead.funding_signal;
+  if (payload?.funding_signal) return payload.funding_signal;
+  if (payload?.Nemo_Enrich_Audit?.funding_signal) return payload.Nemo_Enrich_Audit.funding_signal;
+
+  const notes =
+    payload?.The_Divers?.health_audit_notes ||
+    payload?.Enriched_Lead?.The_Divers?.health_audit_notes ||
+    '';
+  if (typeof notes === 'string' && notes) {
+    const m = notes.match(/\$[\d.,]+\s*[MBK]?(?:\s*million|\s*billion)?|Series\s+[A-E]|Seed\s+(?:round)?|Pre-?[Ss]eed/i);
+    if (m) return m[0];
+  }
+  return null;
+}
+
 function normalizeNemoPayload(payload) {
-  const email =
-    payload?.Contact_Recon?.email ||
-    payload?.Contact_Recon?.email_pattern ||
-    payload?.Contact_Recon?.email_pattern_guess ||
-    payload?.contact_recon?.email ||
-    payload?.contact_recon?.email_pattern ||
-    payload?.contact_recon?.email_pattern_guess ||
-    payload?.Enriched_Lead?.Contact_Recon?.email ||
-    payload?.email ||
+  const email = 
+    payload?.Contact_Recon?.email || 
+    payload?.Contact_Recon?.email_pattern || 
+    payload?.Contact_Recon?.email_pattern_guess || 
+    payload?.contact_recon?.email || 
+    payload?.contact_recon?.email_pattern || 
+    payload?.contact_recon?.email_pattern_guess || 
+    payload?.Enriched_Lead?.Contact_Recon?.email || 
+    payload?.email || 
     null;
 
-  const contactRaw =
-    payload?.Contact_Recon ||
-    payload?.contact_recon ||
-    payload?.Enriched_Lead?.Contact_Recon ||
+  const contactRaw = 
+    payload?.Contact_Recon || 
+    payload?.contact_recon || 
+    payload?.Enriched_Lead?.Contact_Recon || 
     null;
 
   return {
     email,
-    contact_recon: contactRaw ? JSON.stringify(contactRaw) : null,
+    contact_recon: contactRaw || null,
     friction_type: extractFrictionType(payload)
   };
 }
@@ -140,7 +161,10 @@ const AHAB_SYSTEM = `[Task]: Your sole mission is RAW DATA HARVESTING of opportu
 4. SEARCH ITERATION LOGIC: Execute a multi-step Search Pivot. Log every unique query in Harpooner_Logs.
 5. NO SUMMARIES: Do not explain your thought process in the logs.
 6. Fill the Catch array until the output token limit is reached.
+7. COMPANY_FILTER: If the actual hiring company name cannot be determined from the listing, DO NOT include it in the Catch array. Job board aggregators (Jobgether, Jobsora, Indeed, Glassdoor) are not companies. Skip any listing where Company_Name would be "Unknown" or a job board name.
 CRITICAL OUTPUT FORMAT: Return ONLY raw JSON. No markdown. No code fences. No backticks. Structure: {"Harpooner_Logs": ["query"], "Catch": [{"Company_Name": "string", "Job_URL": "string", "Location_Status": "string", "Raw_Primary_Signals": ["string"], "Raw_Health_Signals": ["string"]}]}`;
+
+const AGGREGATORS = new Set(['jobgether', 'jobsora', 'indeed', 'glassdoor', 'linkedin', 'ziprecruiter']);
 
 app.post('/api/ahab', async (req, res) => {
   const { message } = req.body;
@@ -158,8 +182,10 @@ app.post('/api/ahab', async (req, res) => {
 
     let session_ids = [];
     if (result.Catch && Array.isArray(result.Catch)) {
-      session_ids = await Promise.all(result.Catch.map(async (lead) => {
-        const company_name = lead.Company_Name || lead.company_name || 'unknown';
+      const raw_ids = await Promise.all(result.Catch.map(async (lead) => {
+        const company_name = lead.Company_Name || lead.company_name || '';
+        const name_lower = company_name.toLowerCase().trim();
+        if (!name_lower || name_lower === 'unknown' || AGGREGATORS.has(name_lower)) return null;
         const session_id = 'lead_' + company_name.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase();
 
         await pool.query(
@@ -168,11 +194,13 @@ app.post('/api/ahab', async (req, res) => {
            ON CONFLICT (session_id, company_name)
            DO UPDATE SET
              ahab_payload = EXCLUDED.ahab_payload,
-             status = 'Scraped'`,
+             status = 'Scraped'
+           WHERE gtm_career_leads.status = 'Scraped'`,
           [session_id, company_name, JSON.stringify(lead), lead.Job_URL || null]
         );
         return session_id;
       }));
+      session_ids = raw_ids.filter(Boolean);
     }
 
     res.json({ session_ids, harpooner_logs: result.Harpooner_Logs || [] });
@@ -218,7 +246,7 @@ app.post('/api/nemo', async (req, res) => {
 
   const leadRes = await pool.query('SELECT ahab_payload, company_name FROM gtm_career_leads WHERE session_id = $1 LIMIT 1', [input_session_id]);
   if (leadRes.rows.length === 0) return res.status(404).json({ error: 'Lead not found' });
-
+  
   const ahab_payload = leadRes.rows[0].ahab_payload;
   if (!ahab_payload || Object.keys(ahab_payload).length === 0) return res.status(400).json({ error: 'empty ahab_payload' });
   const message = JSON.stringify(ahab_payload);
@@ -244,22 +272,22 @@ app.post('/api/nemo', async (req, res) => {
 
     if (session_id) {
       await pool.query(
-        `UPDATE gtm_career_leads
-         SET nemo_payload = $1,
-             direct_url = COALESCE($2, direct_url),
-             target_service_intent = $3,
+        `UPDATE gtm_career_leads 
+         SET nemo_payload = $1, 
+             direct_url = COALESCE($2, direct_url), 
+             target_service_intent = $3, 
              contact_recon = $4,
              status = $5,
              email = $6,
              friction_type = $7
          WHERE session_id = $8`,
         [
-          JSON.stringify(result),
-          lead.Direct_URL || null,
-          lead.Target_Service_Intent || null,
-          lead.Contact_Recon || null,
-          'Enriched',
-          email,
+          JSON.stringify(result), 
+          lead.Direct_URL || null, 
+          lead.Target_Service_Intent || null, 
+          lead.Contact_Recon || null, 
+          'Enriched', 
+          email, 
           friction_type,
           session_id
         ]
@@ -306,7 +334,7 @@ The Bite is 3-4 sentences. Opens by reflecting reality. Names the villain. Offer
 - NO PROSE: Raw JSON only.
 - BITE_CONSTRAINT: Maximum 3-4 sentences.
 - DATA_STRICTNESS: Only reference what is in the input payload.
-- VOICE_CONSTRAINT: Never imply an existing client relationship or consulting history. Frame all peer suggestions as pattern recognition, not client experience. Write "the move that tends to work here" not "founders I work with" or "peers in your position."}`;
+- VOICE_CONSTRAINT: You are a GTM engineer seeking your first role, not a consultant with clients. NEVER write "founders I work with", "peers in your position", "clients I advise", "many founders", or any phrase implying an existing client base. You have studied this problem deeply. Frame all observations as pattern recognition from research, not personal client experience.}`;
 
 app.post('/api/neptune', async (req, res) => {
   const { session_id: input_session_id } = req.body;
@@ -314,10 +342,10 @@ app.post('/api/neptune', async (req, res) => {
 
   const leadRes = await pool.query('SELECT nemo_payload, company_name FROM gtm_career_leads WHERE session_id = $1 LIMIT 1', [input_session_id]);
   if (leadRes.rows.length === 0) return res.status(404).json({ error: 'Lead not found' });
-
+  
   const nemo_payload = leadRes.rows[0].nemo_payload;
-  const { email, contact_recon, friction_type: nemo_friction_type } = normalizeNemoPayload(nemo_payload);
   if (!nemo_payload || Object.keys(nemo_payload).length === 0) return res.status(400).json({ error: 'empty nemo_payload' });
+  const { email, contact_recon, friction_type: nemo_friction_type } = normalizeNemoPayload(nemo_payload);
   const message = JSON.stringify(nemo_payload);
 
   try {
@@ -344,6 +372,7 @@ app.post('/api/neptune', async (req, res) => {
     const lead = input.Enriched_Lead || input;
     const session_id = input.session_id || input_session_id || null;
     const company_name = lead.Company_Name || null;
+    const funding_signal = extractFundingSignal(input);
 
     if (session_id) {
       await pool.query(
@@ -360,7 +389,7 @@ app.post('/api/neptune', async (req, res) => {
           JSON.stringify(result),
           result.Outreach_Bite || null,
           nemo_friction_type,
-          lead.funding_signal || null,
+          funding_signal,
           email,
           contact_recon,
           session_id
@@ -370,6 +399,12 @@ app.post('/api/neptune', async (req, res) => {
 
     res.json({ status: 'success', session_id, company_name });
   } catch (err) {
+    try {
+      await pool.query(
+        'INSERT INTO fleet_errors (session_id, reason_code, company_name) VALUES ($1, $2, $3)',
+        [input_session_id, 'NEPTUNE_FAILURE', leadRes.rows[0].company_name || null]
+      );
+    } catch {}
     res.status(500).json({ error: err.message });
   }
 });
