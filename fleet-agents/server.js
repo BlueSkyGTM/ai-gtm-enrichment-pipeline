@@ -234,11 +234,26 @@ const NEMO_SYSTEM = `[Task]: SINGLE-LEAD DIAGNOSTIC ENRICHMENT.
 1. url_recon_notes: Confirm company direct domain. One sentence.
 2. health_audit_notes: Note funding or growth signal if found. One sentence.
 3. friction_notes: Name the friction category and one piece of evidence. One sentence.
+
 [Core_Directives]:
 - NO PROSE: Raw JSON only.
 - CITATION_MANDATE: No bracketed citations in any string values.
 - PROOF_REQUIRED: Every technical claim MUST have a proof URL.
-- CONTACT_RECON: Identify the decision-maker. Extract email pattern or LinkedIn profile.}`;
+- CONTACT_RECON: Identify the decision-maker. Extract email pattern or LinkedIn profile.
+
+OUTPUT CONTRACT:
+{
+  "Enriched_Lead": {
+    "Company_Name": "string",
+    "Direct_URL": "string",
+    "Target_Service_Intent": "GTM | Accounting",
+    "Forensic_Friction_Type": "API Stutter | Scale Friction | Manual Data Debt | Displacement Signal",
+    "funding_signal": "string | null",
+    "Contact_Recon": { "name": "string", "title": "string", "email": "string | null", "linkedin": "string | null" },
+    "The_Divers": { "url_recon_notes": "string", "health_audit_notes": "string", "friction_notes": "string" }
+  },
+  "Nemo_Enrich_Audit": { "status": "ACTIVE | SHIPWRECKED", "reason_code": "string | null" }
+}`;
 
 app.post('/api/nemo', async (req, res) => {
   const { session_id: input_session_id } = req.body;
@@ -264,45 +279,57 @@ app.post('/api/nemo', async (req, res) => {
 
     let parsedInput = {};
     try { parsedInput = typeof message === 'string' ? JSON.parse(message) : message; } catch {}
-    const session_id = parsedInput.session_id || input_session_id || null;
+    const session_id = input_session_id || null;
     const lead = result.Enriched_Lead || parsedInput || {};
     const company_name = lead.Company_Name || parsedInput.Company_Name || null;
     const email = lead.Contact_Recon?.email || lead.contact_recon?.email || null;
     const friction_type = extractFrictionType(result);
+    const nemo_funding_signal = result?.Enriched_Lead?.funding_signal || null;
+
+    if (result?.Nemo_Enrich_Audit?.status === 'SHIPWRECKED') {
+      const reason_code = result.Nemo_Enrich_Audit.reason_code || null;
+      await pool.query(
+        'UPDATE gtm_career_leads SET status = \'Shipwrecked\', nemo_payload = $1 WHERE session_id = $2',
+        [JSON.stringify(result), session_id]
+      );
+      await pool.query('INSERT INTO fleet_errors (session_id, reason_code, company_name) VALUES ($1, $2, $3)', [session_id, reason_code, company_name]);
+      return res.json({ status: 'shipwrecked', reason_code });
+    }
 
     if (session_id) {
       await pool.query(
-        `UPDATE gtm_career_leads 
-         SET nemo_payload = $1, 
-             direct_url = COALESCE($2, direct_url), 
-             target_service_intent = $3, 
+        `UPDATE gtm_career_leads
+         SET nemo_payload = $1,
+             direct_url = COALESCE($2, direct_url),
+             target_service_intent = $3,
              contact_recon = $4,
              status = $5,
              email = $6,
-             friction_type = $7
-         WHERE session_id = $8`,
+             friction_type = $7,
+             funding_signal = COALESCE($8, funding_signal)
+         WHERE session_id = $9`,
         [
-          JSON.stringify(result), 
-          lead.Direct_URL || null, 
-          lead.Target_Service_Intent || null, 
-          lead.Contact_Recon || null, 
-          'Enriched', 
-          email, 
+          JSON.stringify(result),
+          lead.Direct_URL || null,
+          lead.Target_Service_Intent || null,
+          lead.Contact_Recon || null,
+          'Enriched',
+          email,
           friction_type,
+          nemo_funding_signal,
           session_id
         ]
       );
     }
 
-    if (result?.Nemo_Enrich_Audit?.status === 'SHIPWRECKED') {
-      const reason_code = result.Nemo_Enrich_Audit.reason_code || null;
-      await pool.query('UPDATE gtm_career_leads SET status = \'Shipwrecked\' WHERE session_id = $1', [session_id]);
-      await pool.query('INSERT INTO fleet_errors (session_id, reason_code, company_name) VALUES ($1, $2, $3)', [session_id, reason_code, company_name]);
-      return res.json({ status: 'shipwrecked', reason_code });
-    }
-
     res.json({ status: 'success', session_id });
   } catch (err) {
+    try {
+      await pool.query(
+        'INSERT INTO fleet_errors (session_id, reason_code, company_name) VALUES ($1, $2, $3)',
+        [input_session_id, 'NEMO_FAILURE', leadRes.rows[0].company_name || null]
+      );
+    } catch {}
     res.status(500).json({ error: err.message });
   }
 });
@@ -334,7 +361,7 @@ The Bite is 3-4 sentences. Opens by reflecting reality. Names the villain. Offer
 - NO PROSE: Raw JSON only.
 - BITE_CONSTRAINT: Maximum 3-4 sentences.
 - DATA_STRICTNESS: Only reference what is in the input payload.
-- VOICE_CONSTRAINT: You are a GTM engineer seeking your first role, not a consultant with clients. NEVER write "founders I work with", "peers in your position", "clients I advise", "many founders", or any phrase implying an existing client base. You have studied this problem deeply. Frame all observations as pattern recognition from research, not personal client experience.}`;
+- VOICE_CONSTRAINT: Write in the voice of someone who spent 200 hours studying GTM failure patterns in public job postings and LinkedIn signals — not a consultant with clients. NEVER write "founders I work with", "peers in your position", "clients I advise", "my research focuses on", or any phrase implying an existing client base or consulting practice. You observed this pattern. You did not advise on it.}`;
 
 app.post('/api/neptune', async (req, res) => {
   const { session_id: input_session_id } = req.body;
@@ -358,10 +385,11 @@ app.post('/api/neptune', async (req, res) => {
         responseMimeType: 'application/json',
         responseSchema: {
           type: 'object',
-          required: ['Neptune_Log', 'Outreach_Bite'],
+          required: ['Neptune_Log', 'Outreach_Bite', 'funding_signal'],
           properties: {
             Neptune_Log: { type: 'object', properties: { intent_recognized: { type: 'string' }, friction_strategy: { type: 'string' }, rule_of_one_check: { type: 'string' } } },
             Outreach_Bite: { type: 'string' },
+            funding_signal: { type: 'string', nullable: true },
           },
         },
       },
@@ -370,9 +398,9 @@ app.post('/api/neptune', async (req, res) => {
     let input = {};
     try { input = typeof message === 'string' ? JSON.parse(message) : message; } catch {}
     const lead = input.Enriched_Lead || input;
-    const session_id = input.session_id || input_session_id || null;
+    const session_id = input_session_id || null;
     const company_name = lead.Company_Name || null;
-    const funding_signal = extractFundingSignal(input);
+    const funding_signal = result.funding_signal ?? extractFundingSignal(input);
 
     if (session_id) {
       await pool.query(
