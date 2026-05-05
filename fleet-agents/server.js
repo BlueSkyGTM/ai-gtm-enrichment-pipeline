@@ -190,6 +190,7 @@ app.post('/api/ahab', async (req, res) => {
         maxOutputTokens: 16384,
       },
     });
+    if (result?.raw) throw new Error('Gemini returned unparseable response — raw fallback detected');
 
     let session_ids = [];
     if (result.Catch && Array.isArray(result.Catch)) {
@@ -207,7 +208,7 @@ app.post('/api/ahab', async (req, res) => {
              ahab_payload = EXCLUDED.ahab_payload,
              status = 'Scraped'
            WHERE gtm_career_leads.status = 'Scraped'`,
-          [session_id, company_name, JSON.stringify(lead), lead.Job_URL || null]
+          [session_id, company_name, JSON.stringify(lead), sanitizeDirectUrl(lead.Job_URL)]
         );
         return session_id;
       }));
@@ -216,6 +217,12 @@ app.post('/api/ahab', async (req, res) => {
 
     res.json({ session_ids, harpooner_logs: result.Harpooner_Logs || [] });
   } catch (err) {
+    try {
+      await pool.query(
+        'INSERT INTO fleet_errors (session_id, reason_code, company_name) VALUES ($1, $2, $3)',
+        [null, 'AHAB_FAILURE', null]
+      );
+    } catch {}
     res.status(500).json({ error: err.message });
   }
 });
@@ -226,7 +233,6 @@ const NEMO_SYSTEM = `[Task]: SINGLE-LEAD DIAGNOSTIC ENRICHMENT.
 
 [Clay_Readiness_Protocol]:
 - Every claim must be sourced. No invented details.
-- Direct_URL must be the company own domain, not a job board.
 - Direct_URL must be the company's own domain, confirmed by direct navigation. Return null if it cannot be independently verified.
 - Contact_Recon must be a real person with a verifiable role.
 
@@ -289,6 +295,7 @@ app.post('/api/nemo', async (req, res) => {
         maxOutputTokens: 8192,
       },
     });
+    if (result?.raw) throw new Error('Gemini returned unparseable response — raw fallback detected');
 
     let parsedInput = {};
     try { parsedInput = typeof message === 'string' ? JSON.parse(message) : message; } catch {}
@@ -393,15 +400,21 @@ The Bite is 3-4 sentences. Opens by reflecting reality. Names the villain. Offer
 - DATA_STRICTNESS: Only reference what is in the input payload.
 - VOICE_CONSTRAINT: Write as someone who has spent 200 hours studying GTM failure patterns from job postings and LinkedIn signals. Every observation comes from pattern recognition across hundreds of postings, not personal client work. State what you observed. Do not reference the act of observing.}`;
 
-app.post('/api/neptune', async (req, res) => {
-  const { session_id: input_session_id } = req.body;
-  if (!input_session_id) return res.status(400).json({ error: 'session_id required' });
-
+async function runNeptuneSynthesis(input_session_id) {
   const leadRes = await pool.query('SELECT nemo_payload, company_name FROM gtm_career_leads WHERE session_id = $1 LIMIT 1', [input_session_id]);
-  if (leadRes.rows.length === 0) return res.status(404).json({ error: 'Lead not found' });
-  
+  if (leadRes.rows.length === 0) {
+    const err = new Error('Lead not found');
+    err.httpStatus = 404;
+    throw err;
+  }
+
   const nemo_payload = leadRes.rows[0].nemo_payload;
-  if (!nemo_payload || Object.keys(nemo_payload).length === 0) return res.status(400).json({ error: 'empty nemo_payload' });
+  if (!nemo_payload || Object.keys(nemo_payload).length === 0) {
+    const err = new Error('empty nemo_payload');
+    err.httpStatus = 400;
+    throw err;
+  }
+
   const { email, contact_recon, friction_type: nemo_friction_type } = normalizeNemoPayload(nemo_payload);
   const message = JSON.stringify(nemo_payload);
 
@@ -424,38 +437,36 @@ app.post('/api/neptune', async (req, res) => {
         },
       },
     });
+    if (result?.raw) throw new Error('Gemini returned unparseable response — raw fallback detected');
 
     let input = {};
     try { input = typeof message === 'string' ? JSON.parse(message) : message; } catch {}
     const lead = input.Enriched_Lead || input;
-    const session_id = input_session_id || null;
     const company_name = lead.Company_Name || null;
     const funding_signal = result.funding_signal ?? extractFundingSignal(input);
 
-    if (session_id) {
-      await pool.query(
-        `UPDATE gtm_career_leads
-         SET neptune_payload = $1,
-             outreach_bite = $2,
-             friction_type = COALESCE($3, friction_type),
-             funding_signal = $4,
-             email = $5,
-             contact_recon = $6,
-             status = 'Finished'
-         WHERE session_id = $7`,
-        [
-          JSON.stringify(result),
-          result.Outreach_Bite || null,
-          nemo_friction_type,
-          funding_signal,
-          email,
-          contact_recon,
-          session_id
-        ]
-      );
-    }
+    await pool.query(
+      `UPDATE gtm_career_leads
+       SET neptune_payload = $1,
+           outreach_bite = $2,
+           friction_type = COALESCE($3, friction_type),
+           funding_signal = $4,
+           email = $5,
+           contact_recon = $6,
+           status = 'Finished'
+       WHERE session_id = $7`,
+      [
+        JSON.stringify(result),
+        result.Outreach_Bite || null,
+        nemo_friction_type,
+        funding_signal,
+        email,
+        contact_recon,
+        input_session_id
+      ]
+    );
 
-    res.json({ status: 'success', session_id, company_name });
+    return { company_name };
   } catch (err) {
     try {
       await pool.query(
@@ -463,81 +474,29 @@ app.post('/api/neptune', async (req, res) => {
         [input_session_id, 'NEPTUNE_FAILURE', leadRes.rows[0].company_name || null]
       );
     } catch {}
-    res.status(500).json({ error: err.message });
+    throw err;
+  }
+}
+
+app.post('/api/neptune', async (req, res) => {
+  const { session_id: input_session_id } = req.body;
+  if (!input_session_id) return res.status(400).json({ error: 'session_id required' });
+  try {
+    const { company_name } = await runNeptuneSynthesis(input_session_id);
+    res.json({ status: 'success', session_id: input_session_id, company_name });
+  } catch (err) {
+    res.status(err.httpStatus || 500).json({ error: err.message });
   }
 });
 
 app.post('/api/reprocess', async (req, res) => {
   const { session_id: input_session_id } = req.body;
   if (!input_session_id) return res.status(400).json({ error: 'session_id required' });
-
-  const leadRes = await pool.query('SELECT nemo_payload, company_name FROM gtm_career_leads WHERE session_id = $1 LIMIT 1', [input_session_id]);
-  if (leadRes.rows.length === 0) return res.status(404).json({ error: 'Lead not found' });
-
-  const nemo_payload = leadRes.rows[0].nemo_payload;
-  if (!nemo_payload || Object.keys(nemo_payload).length === 0) return res.status(400).json({ error: 'empty nemo_payload' });
-  const { email, contact_recon, friction_type: nemo_friction_type } = normalizeNemoPayload(nemo_payload);
-  const message = JSON.stringify(nemo_payload);
-
   try {
-    const result = await callGenerateContent('gemini-2.5-pro', {
-      systemInstruction: { parts: [{ text: NEPTUNE_SYSTEM }] },
-      contents: [{ role: 'user', parts: [{ text: message }] }],
-      generationConfig: {
-        temperature: 0.7,
-        maxOutputTokens: 8192,
-        responseMimeType: 'application/json',
-        responseSchema: {
-          type: 'object',
-          required: ['Neptune_Log', 'Outreach_Bite', 'funding_signal'],
-          properties: {
-            Neptune_Log: { type: 'object', properties: { intent_recognized: { type: 'string' }, friction_strategy: { type: 'string' }, rule_of_one_check: { type: 'string' } } },
-            Outreach_Bite: { type: 'string' },
-            funding_signal: { type: 'string', nullable: true },
-          },
-        },
-      },
-    });
-
-    let input = {};
-    try { input = typeof message === 'string' ? JSON.parse(message) : message; } catch {}
-    const lead = input.Enriched_Lead || input;
-    const session_id = input_session_id || null;
-    const company_name = lead.Company_Name || null;
-    const funding_signal = result.funding_signal ?? extractFundingSignal(input);
-
-    if (session_id) {
-      await pool.query(
-        `UPDATE gtm_career_leads
-         SET neptune_payload = $1,
-             outreach_bite = $2,
-             friction_type = COALESCE($3, friction_type),
-             funding_signal = $4,
-             email = $5,
-             contact_recon = $6,
-             status = 'Finished'
-         WHERE session_id = $7`,
-        [
-          JSON.stringify(result),
-          result.Outreach_Bite || null,
-          nemo_friction_type,
-          funding_signal,
-          email,
-          contact_recon,
-          session_id
-        ]
-      );
-    }
-
-    res.json({ status: 'reprocessed', session_id, company_name });
+    const { company_name } = await runNeptuneSynthesis(input_session_id);
+    res.json({ status: 'reprocessed', session_id: input_session_id, company_name });
   } catch (err) {
-    try {
-      await pool.query(
-        'INSERT INTO fleet_errors (session_id, reason_code, company_name) VALUES ($1, $2, $3)',
-        [input_session_id, 'NEPTUNE_FAILURE', leadRes.rows[0].company_name || null]
-      );
-    } catch {}
-    res.status(500).json({ error: err.message });
+    res.status(err.httpStatus || 500).json({ error: err.message });
   }
 });
 
