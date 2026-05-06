@@ -162,21 +162,30 @@ That's the whole story.
 
 ```
 outbound-pipeline/
-├── CLAUDE.md                         Session instructions and current architecture reference
-├── STATE.md                          Current pickup point — read this before starting
+├── README.md                         This file
+├── CLAUDE.md                         Session instructions — routing, rules, campaign registry
+├── STATE.md                          Live infrastructure status and pickup point
+├── DECISIONS.md                      Locked architecture decisions — do not re-litigate
 ├── framework/
-│   └── WORKFLOW_BUILDER.md           Deterministic build instructions for new campaign workflows
-├── pipeline/
-│   ├── infrastructure/
-│   │   └── sovereign_hub.md          Infrastructure map, credentials, incident log, Pull Model spec
-│   ├── memory/
-│   │   └── schema_map.sql            Source of truth for all table schemas
-│   └── nodes/
-│       └── library.json              Node definitions for all 6 Pull Model workflow nodes
-├── fleet-agents/
-│   ├── server.js                     All agent logic, AI calls, and Postgres persistence
-│   └── package.json                  Node dependencies
-└── campaigns/
-    └── gtm_career_hunt/
-        └── workflow_v6.json          Current Pull Model workflow — 6 nodes, linear chain
+│   ├── WORKFLOW_BUILDER.md           Deterministic build guide for new campaign workflow JSONs
+│   ├── WORKFLOW_USAGE.md             Bulk enrichment and re-enrich workflow usage guide
+│   ├── RETOOL_SETUP.md               Retool SQL queries and detail panel binding reference
+│   ├── SUBAGENT_SKILL.md             Subagent dispatch protocol for the skill layer
+│   ├── agents/
+│   │   ├── stage_contracts.md        Formal I/O contracts — Ahab→Nemo→Neptune handoffs
+│   │   └── archive/                  n8n-era YAML prompts — archived reference only
+│   ├── api/
+│   │   └── agent_platform_call.md    Agent Platform endpoints, auth, request/response reference
+│   ├── prompt_library/               Campaign-specific prompt injections (one file per campaign)
+│   ├── prompts/                      Active system prompt staging area (ahab/nemo/neptune)
+│   ├── schema/
+│   │   └── campaign_template.sql     Template for creating new campaign output tables
+│   └── setup/
+│       └── new_campaign.md           Checklist for standing up a new campaign from scratch
+└── fleet-agents/
+    ├── CHANGELOG.md                  All server.js fixes, decisions, and known gaps
+    ├── RECONSTRUCTION.md             How to reconstruct server.js from scratch if lost
+    └── package.json                  Node dependencies
 ```
+
+`pipeline/` and `campaigns/` are private — not included in this repo.

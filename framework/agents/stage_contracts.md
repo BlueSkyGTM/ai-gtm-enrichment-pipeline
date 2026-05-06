@@ -1,3 +1,5 @@
+> **ARCHIVED.** Agent prompts are now embedded in `fleet-agents/server.js` and defined as placeholders in `framework/prompts/`. These YAML files in `framework/agents/archive/` are retained for reference only.
+
 # Stage Contracts  Agent Input/Output Specifications
 
 Each agent in the pipeline has a formal contract: what it receives, what it produces, and what the next stage expects. Campaign variants must honor these contracts. Ahab is optional  if your lead source is a pre-built list, start at the Nemo contract.

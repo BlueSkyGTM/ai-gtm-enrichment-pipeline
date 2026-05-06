@@ -6,11 +6,11 @@
 ## Context Loading (Claude infers — user does not declare)
 
 **If the session is about execution** (fixing workflows, schema changes, debugging n8n, Retool, Cloud SQL):
-- Read: `STATE.md` → `pipeline/memory/schema_map.sql` → relevant `config.yaml`
+- Read: `STATE.md` → `framework/schema/campaign_template.sql` → relevant campaign workflow JSON
 - Act precisely. One job at a time. Stop and report.
 
 **If the session is about strategy** (prompt review, ICP, campaign design, architecture):
-- Read: `DECISIONS.md` → `pipeline/prompts/campaign_staging_area.md` → `framework/agents/`
+- Read: `DECISIONS.md` → `framework/prompts/` → `framework/agents/archive/`
 - Reason before acting. Nothing moves to a live file without staging area alignment.
 
 Ray directs the session. Claude reads the intent from the first message and loads accordingly.
@@ -24,19 +24,14 @@ Ray directs the session. Claude reads the intent from the first message and load
 | Current infrastructure state and pickup point | `STATE.md` |
 | Locked decisions — do not re-litigate | `DECISIONS.md` |
 | Start or amend a campaign | `framework/setup/new_campaign.md` |
-| Campaign config (ICP, signals, schedule) | `campaigns/{name}/config.yaml` |
-| Campaign prompt files | `campaigns/{name}/*_prompt.yaml` |
+| Campaign workflow JSON (re-import to n8n) | `campaigns/{name}/workflow*.json` → n8n UI |
 | Prompt library (campaign-specific injections) | `framework/prompt_library/{name}.yaml` |
-| Stage a prompt change before going live | `pipeline/prompts/campaign_staging_area.md` |
-| Baseline agent behavior (never campaign-specific) | `framework/agents/` |
+| Stage a prompt change before going live | `framework/prompts/` |
+| Baseline agent behavior (never campaign-specific) | `framework/agents/archive/` |
 | Agent Platform API call structure | `framework/api/agent_platform_call.md` |
-| Credentials, URLs, infrastructure IDs | `pipeline/infrastructure/sovereign_hub.md` |
-| Re-import a workflow to n8n | `campaigns/{name}/workflow.json` → n8n UI |
-| Database schema | `pipeline/memory/schema_map.sql` → then Cloud SQL |
-| Fleet table reference | `pipeline/infrastructure/table_guide.md` |
-| Search arrays (never hardcode in n8n) | `pipeline/nodes/campaigns.json` |
-| Node library for workflow builds | `pipeline/nodes/library.json` |
-| Cloud Scheduler setup commands | `pipeline/infrastructure/sovereign_hub.md` → Cloud Scheduler section |
+| Database schema template | `framework/schema/campaign_template.sql` → then Cloud SQL |
+| Build or debug a workflow | `framework/WORKFLOW_BUILDER.md` |
+| Retool query reference | `framework/RETOOL_SETUP.md` |
 
 ---
 
@@ -72,12 +67,12 @@ Three-agent AI pipeline for nightly lead discovery, forensic enrichment, and out
 
 ## Key Rules (durable — never change without updating DECISIONS.md)
 
-1. `pipeline/memory/schema_map.sql` is the only source of truth for schema. Update it before touching the database.
-2. `framework/agents/` is the source of truth for agent behavior. Campaign prompts are derived — never remove load-bearing directives.
-3. `pipeline/nodes/campaigns.json` is the only source of truth for search arrays. Never hardcode in n8n nodes.
+1. Cloud SQL is the source of truth for live schema. `framework/schema/campaign_template.sql` is the template — use it to create new campaign tables.
+2. `fleet-agents/server.js` is the source of truth for agent behavior. `framework/agents/archive/` is retained for reference only. Campaign prompts are derived — never remove load-bearing directives.
+3. Search arrays (company targets, excluded companies) live in each campaign's Set_Campaign_Message node. Never hardcode separate JSON files — the workflow JSON is the single source.
 4. Never use `pipeline_admin` for runtime connections. Use `fleet_app`.
 5. Never use Gemini CLI for database operations. Use `gcloud sql connect` via Cloud Shell.
-6. Every prompt change stages in `campaign_staging_area.md` and tests in Agent Studio before going live.
+6. Every prompt change stages in `framework/prompts/` and tests in Agent Studio before going live.
 7. `SHIPWRECKED` leads write to `fleet_errors`, never halt the workflow.
 8. Session IDs are generated server-side by Ahab: `'lead_' + company_name.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase()`. One session_id per unique company name. Duplicate company names from Ahab collide to the same session_id (intentional dedup — ON CONFLICT DO UPDATE).
 9. Never push `pipeline/` to a public repo. `framework/` only.

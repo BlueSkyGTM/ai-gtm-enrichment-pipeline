@@ -34,7 +34,7 @@ Workflows rebuilt around direct Agent Platform HTTP Request calls. No LangChain 
 ### Claude Code can build (next session)
 
 - [ ] **V4 universal workflow JSON** — build the n8n HTTP Request workflow for all 6 campaigns using `framework/api/agent_platform_call.md`. Includes pre-Ahab dedup node, Ahab/Nemo/Neptune HTTP Request nodes, Splitter, SHIPWRECKED branch to `fleet_errors`, and final Postgres write. One reusable workflow template, then fork per campaign.
-- [ ] **Populate `tracked_companies`** in `pipeline/nodes/campaigns.json` — add real company slugs for each career hunt campaign once targets are identified. Scanner is wired; it just needs the list.
+- [ ] **Populate excluded companies** — add known company slugs to each campaign's Set_Campaign_Message node in the workflow JSON once targets are identified. These are pre-dedup signals for the Code node that excludes known companies before Ahab runs.
 
 ### Manual — Ray only (cannot be automated)
 
@@ -154,7 +154,7 @@ Report the output and the diagnostic summary, then stop. Do not attempt to fix, 
 
 **CRITICAL — `--set-env-vars` replaces ALL env vars, it does not append.** Every update command must include every existing variable or they are silently wiped. Always pull current env vars first (`gcloud run revisions describe`) before writing an update command.
 
-**Service definition YAML:** For multi-container deployments use `gcloud run services replace` with `pipeline/infrastructure/n8n_orchestrator_service.yaml`. Never use `gcloud run services update` with flags — it silently drops vars not included. The YAML is the single source of truth.
+**Service definition YAML:** For multi-container deployments use `gcloud run services replace` with a service YAML. Never use `gcloud run services update` with flags — it silently drops vars not included. Pull the current service YAML with `gcloud run services describe n8n-orchestrator --format export` before making changes. The exported YAML is the single source of truth.
 
 ---
 

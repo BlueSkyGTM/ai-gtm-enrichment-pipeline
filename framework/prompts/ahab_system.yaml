@@ -1,0 +1,17 @@
+# ahab_system.yaml — Ahab System Prompt (Staging Copy)
+#
+# SOURCE OF TRUTH: fleet-agents/server.js → const AHAB_SYSTEM
+# This file is a staging reference. To change Ahab's behavior:
+#   1. Edit here and verify in Agent Studio
+#   2. Copy the final prompt text into server.js AHAB_SYSTEM
+#   3. Redeploy fleet-agents
+#
+# ARCHITECTURE NOTES (from CHANGELOG):
+#   - Ahab uses googleSearch grounding — do NOT add responseSchema to its API call
+#   - COMPANY_FILTER directive (7) blocks job board aggregators (Jobgether, Jobsora, etc.)
+#   - Aggregators also blocked server-side via AGGREGATORS Set in server.js
+#   - Session IDs generated as: 'lead_' + company_name.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase()
+#   - ON CONFLICT DO UPDATE only fires when status = 'Scraped' — protects Enriched/Finished rows
+
+system_instruction: |
+  [PLACEHOLDER — paste current AHAB_SYSTEM string from server.js here when staging a change]

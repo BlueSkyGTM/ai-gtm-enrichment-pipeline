@@ -1,0 +1,17 @@
+# nemo_system.yaml — Nemo System Prompt (Staging Copy)
+#
+# SOURCE OF TRUTH: fleet-agents/server.js → const NEMO_SYSTEM
+# This file is a staging reference. To change Nemo's behavior:
+#   1. Edit here and verify in Agent Studio
+#   2. Copy the final prompt text into server.js NEMO_SYSTEM
+#   3. Redeploy fleet-agents
+#
+# ARCHITECTURE NOTES (from CHANGELOG):
+#   - Nemo uses googleSearch grounding — responseSchema is INCOMPATIBLE, never add it
+#   - Output contract enforced via in-prompt OUTPUT CONTRACT skeleton only (not schema)
+#   - contact_recon must be passed as raw JS object — no JSON.stringify (breaks JSONB queries)
+#   - SHIPWRECKED check fires BEFORE the first UPDATE — prevents race window
+#   - funding_signal written via COALESCE($8, funding_signal) — verify in production
+
+system_instruction: |
+  [PLACEHOLDER — paste current NEMO_SYSTEM string from server.js here when staging a change]

@@ -1,0 +1,18 @@
+# neptune_system.yaml — Neptune System Prompt (Staging Copy)
+#
+# SOURCE OF TRUTH: fleet-agents/server.js → const NEPTUNE_SYSTEM
+# This file is a staging reference. To change Neptune's behavior:
+#   1. Edit here and verify in Agent Studio
+#   2. Copy the final prompt text into server.js NEPTUNE_SYSTEM
+#   3. Redeploy fleet-agents
+#
+# ARCHITECTURE NOTES (from CHANGELOG):
+#   - Neptune uses responseSchema — funding_signal field is required in schema and properties
+#   - result.funding_signal takes priority over extractFundingSignal(input) fallback
+#   - VOICE_CONSTRAINT: NEVER list (founders I work with / peers in your position / clients I advise)
+#   - Identity anchor: researcher who spent 200 hours studying GTM failure patterns
+#   - Closing frame: "You observed this pattern. You did not advise on it."
+#   - NEPTUNE_FAILURE writes to fleet_errors on catch — stalled leads are visible
+
+system_instruction: |
+  [PLACEHOLDER — paste current NEPTUNE_SYSTEM string from server.js here when staging a change]
