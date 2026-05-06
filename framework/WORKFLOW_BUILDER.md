@@ -512,3 +512,240 @@ Run these checks before importing the workflow JSON into n8n. Fix any failure be
 - [ ] Record the n8n workflow ID (shown in the URL after import) in `sovereign_hub.md` Workflows table
 - [ ] Add Cloud Scheduler job pointing to the workflow's execute endpoint (see sovereign_hub.md Cloud Scheduler section)
 - [ ] Activate only after Cloud Scheduler is confirmed
+
+---
+
+## 6. Template 2 — Bulk Workflow
+
+Use when the lead list is pre-sourced (e.g. imported from a spreadsheet or Clay export). Ahab is skipped. n8n holds the list; fleet-agents seeds the rows and returns session_ids.
+
+### Node chain
+
+```
+Engine_Ignition → Set_Bulk_Input → Seed_Fleet_Call → Parse_Session_IDs → Nemo_Fleet_Call → Neptune_Fleet_Call
+```
+
+6 nodes. Same count as Template 1. Only nodes 2 and 3 change.
+
+### What changes vs Template 1
+
+| Node | Template 1 | Template 2 |
+|---|---|---|
+| Node 2 | `Set_Campaign_Message` — plain string for Ahab | `Set_Bulk_Input` — JSON array of company objects |
+| Node 3 | `Ahab_Fleet_Call` — POST `/api/ahab` with `message` | `Seed_Fleet_Call` — POST `/api/seed` with `companies` array |
+| Nodes 4–6 | Unchanged | Unchanged |
+
+### Prerequisite — new server.js endpoint
+
+Add `/api/seed` to fleet-agents before importing this workflow. The endpoint:
+- Accepts `{ companies: [{ company_name, job_url }] }`
+- For each entry: derives `session_id`, builds minimal `ahab_payload`, INSERTs into the campaign table
+- Applies the same AGGREGATORS filter and `sanitizeDirectUrl` as `/api/ahab`
+- Uses the same `ON CONFLICT ... WHERE status = 'Scraped'` guard
+- Returns `{ session_ids: [...] }` — same shape as `/api/ahab`
+
+Downstream nodes (Parse_Session_IDs → Nemo → Neptune) are identical because the response contract is identical.
+
+### Node 2 — Set_Bulk_Input
+
+```json
+{
+  "id": "node-02-set-bulk-input",
+  "name": "Set_Bulk_Input",
+  "type": "n8n-nodes-base.set",
+  "typeVersion": 3.4,
+  "position": [220, 300],
+  "parameters": {
+    "assignments": {
+      "assignments": [
+        {
+          "id": "1",
+          "name": "companies",
+          "value": "{{COMPANY_LIST_JSON}}",
+          "type": "array"
+        }
+      ]
+    },
+    "options": {}
+  }
+}
+```
+
+**Variable:** `{{COMPANY_LIST_JSON}}` — a JSON array of objects. Each object must have `company_name` (required) and `job_url` (optional).
+
+```json
+[
+  { "company_name": "Acme Corp", "job_url": "https://acmecorp.com/careers/revops-lead" },
+  { "company_name": "Lattice", "job_url": "https://lattice.com/jobs/gtm-engineer" }
+]
+```
+
+### Node 3 — Seed_Fleet_Call
+
+```json
+{
+  "id": "node-03-seed-fleet-call",
+  "name": "Seed_Fleet_Call",
+  "type": "n8n-nodes-base.httpRequest",
+  "typeVersion": 4.2,
+  "position": [440, 300],
+  "parameters": {
+    "method": "POST",
+    "url": "https://fleet-agents-954265623326.us-central1.run.app/api/seed",
+    "sendBody": true,
+    "bodyContentType": "json",
+    "bodyParameters": {
+      "parameters": [
+        {
+          "name": "companies",
+          "value": "={{ $json.companies }}"
+        }
+      ]
+    },
+    "options": {}
+  }
+}
+```
+
+### Connections block
+
+```json
+"connections": {
+  "Engine_Ignition": {
+    "main": [[{ "node": "Set_Bulk_Input", "type": "main", "index": 0 }]]
+  },
+  "Set_Bulk_Input": {
+    "main": [[{ "node": "Seed_Fleet_Call", "type": "main", "index": 0 }]]
+  },
+  "Seed_Fleet_Call": {
+    "main": [[{ "node": "Parse_Session_IDs", "type": "main", "index": 0 }]]
+  },
+  "Parse_Session_IDs": {
+    "main": [[{ "node": "Nemo_Fleet_Call", "type": "main", "index": 0 }]]
+  },
+  "Nemo_Fleet_Call": {
+    "main": [[{ "node": "Neptune_Fleet_Call", "type": "main", "index": 0 }]]
+  }
+}
+```
+
+### Validation additions for Template 2
+
+Run the Template 1 checklist, then verify:
+
+- [ ] `Set_Bulk_Input` assignment is type `array`, not `string`
+- [ ] Each object in the array has at minimum a non-empty `company_name`
+- [ ] `Seed_Fleet_Call` URL ends in `/api/seed` (not `/api/ahab`)
+- [ ] `Seed_Fleet_Call` body field name is `companies` (not `message`)
+- [ ] `/api/seed` endpoint is deployed to fleet-agents before activating
+
+---
+
+## 7. Template 3 — Re-Enrich Workflow
+
+Use to refresh existing rows where enrichment is incomplete. Reads session_ids from the database via a fleet endpoint, then re-runs the full Nemo → Neptune chain against the existing `ahab_payload`. No new leads are created.
+
+Primary use case: backfilling `contact_name`, `contact_title`, `linkedin_url` on rows that completed before those columns were added.
+
+### Node chain
+
+```
+Engine_Ignition → Fetch_Requeue_IDs → Parse_Session_IDs → Nemo_Fleet_Call → Neptune_Fleet_Call
+```
+
+5 nodes. No Set node (no input to configure). No Ahab.
+
+### What changes vs Template 1
+
+| Node | Template 1 | Template 3 |
+|---|---|---|
+| Node 2 | `Set_Campaign_Message` — sets Ahab search prompt | Removed entirely |
+| Node 3 | `Ahab_Fleet_Call` — discovers new leads | `Fetch_Requeue_IDs` — queries existing rows at `/api/requeue` |
+| Nodes 4–6 | Parse → Nemo → Neptune | Identical — same node bodies, same positions shifted left by one slot |
+
+Node positions shift: `[0,300]`, `[220,300]`, `[440,300]`, `[660,300]`, `[880,300]`.
+
+### Prerequisite — new server.js endpoint
+
+Add `/api/requeue` to fleet-agents before importing this workflow. The endpoint:
+- Accepts no body (or optional `{ criteria }` for future extension)
+- Queries: `SELECT session_id FROM gtm_career_leads WHERE contact_name IS NULL AND status = 'Finished' LIMIT 50`
+- Returns `{ session_ids: [...] }` — same shape as `/api/ahab`
+- The LIMIT 50 guard prevents runaway re-enrichment batches on large tables
+
+Nemo's `/api/nemo` handler is unchanged — it already reads `ahab_payload` from the row and re-enriches. Re-Enrich simply re-invokes the same endpoint on existing rows.
+
+### Node 1 — Engine_Ignition
+
+Same as Template 1. Set a weekly or on-demand cron. Example: `0 6 * * 0` (Sundays at 6AM).
+
+### Node 2 — Fetch_Requeue_IDs
+
+Replaces both `Set_Campaign_Message` and `Ahab_Fleet_Call` from Template 1.
+
+```json
+{
+  "id": "node-02-fetch-requeue-ids",
+  "name": "Fetch_Requeue_IDs",
+  "type": "n8n-nodes-base.httpRequest",
+  "typeVersion": 4.2,
+  "position": [220, 300],
+  "parameters": {
+    "method": "POST",
+    "url": "https://fleet-agents-954265623326.us-central1.run.app/api/requeue",
+    "sendBody": false,
+    "options": {}
+  }
+}
+```
+
+No body. The endpoint determines the query criteria internally.
+
+### Node 3 — Parse_Session_IDs
+
+Identical to Template 1. Same jsCode, same position shifted to `[440, 300]`.
+
+### Node 4 — Nemo_Fleet_Call
+
+Identical to Template 1. Position `[660, 300]`.
+
+### Node 5 — Neptune_Fleet_Call
+
+Identical to Template 1. Position `[880, 300]`.
+
+### Connections block
+
+```json
+"connections": {
+  "Engine_Ignition": {
+    "main": [[{ "node": "Fetch_Requeue_IDs", "type": "main", "index": 0 }]]
+  },
+  "Fetch_Requeue_IDs": {
+    "main": [[{ "node": "Parse_Session_IDs", "type": "main", "index": 0 }]]
+  },
+  "Parse_Session_IDs": {
+    "main": [[{ "node": "Nemo_Fleet_Call", "type": "main", "index": 0 }]]
+  },
+  "Nemo_Fleet_Call": {
+    "main": [[{ "node": "Neptune_Fleet_Call", "type": "main", "index": 0 }]]
+  }
+}
+```
+
+### What Re-Enrich does NOT do
+
+- It does not reset status. Nemo's UPDATE uses `status = 'Enriched'`, then Neptune sets `status = 'Finished'`. A `Finished` row that goes through Re-Enrich cycles back to `Finished` at the end — no data loss.
+- It does not re-discover companies. Ahab is skipped entirely. Only the Nemo and Neptune synthesis runs again.
+- It does not touch `ahab_payload`. Nemo reads `ahab_payload` as-is. If the original scrape was poor, Re-Enrich will not improve it.
+
+### Validation additions for Template 3
+
+Run the Template 1 checklist with these adjustments:
+
+- [ ] `nodes` array has exactly **5** items (not 6)
+- [ ] Node names are: `Engine_Ignition`, `Fetch_Requeue_IDs`, `Parse_Session_IDs`, `Nemo_Fleet_Call`, `Neptune_Fleet_Call`
+- [ ] `connections` has exactly **4** entries (not 5)
+- [ ] `Fetch_Requeue_IDs` URL ends in `/api/requeue`
+- [ ] `Fetch_Requeue_IDs` has `sendBody: false`
+- [ ] `/api/requeue` endpoint is deployed to fleet-agents before activating
+- [ ] Confirm at least one row exists matching `contact_name IS NULL AND status = 'Finished'` before running

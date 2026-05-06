@@ -228,6 +228,40 @@ app.post('/api/ahab', async (req, res) => {
   }
 });
 
+app.post('/api/seed', async (req, res) => {
+  const { companies } = req.body;
+  if (!Array.isArray(companies) || companies.length === 0) {
+    return res.status(400).json({ error: 'companies array required' });
+  }
+  try {
+    const raw_ids = await Promise.all(companies.map(async (entry) => {
+      const company_name = entry.company_name || '';
+      const name_lower = company_name.toLowerCase().trim();
+      if (!name_lower || name_lower === 'unknown' || AGGREGATORS.has(name_lower)) return null;
+      const session_id = 'lead_' + company_name.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase();
+      const job_url = sanitizeDirectUrl(entry.job_url || null);
+      const ahab_payload = { Company_Name: company_name, Job_URL: entry.job_url || null };
+
+      await pool.query(
+        `INSERT INTO gtm_career_leads (session_id, company_name, ahab_payload, direct_url, job_url, status)
+         VALUES ($1, $2, $3, $4, $5, 'Scraped')
+         ON CONFLICT (session_id, company_name)
+         DO UPDATE SET
+           ahab_payload = EXCLUDED.ahab_payload,
+           job_url = EXCLUDED.job_url,
+           status = 'Scraped'
+         WHERE gtm_career_leads.status = 'Scraped'`,
+        [session_id, company_name, JSON.stringify(ahab_payload), job_url, job_url]
+      );
+      return session_id;
+    }));
+    const session_ids = raw_ids.filter(Boolean);
+    res.json({ session_ids });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 const NEMO_SYSTEM = `[Task]: SINGLE-LEAD DIAGNOSTIC ENRICHMENT.
 [Persona]: Nemo, the Intelligence Analyst.
 [Mission]: Analyze ONE lead. Identify the friction or displacement signal. Produce a Clay-ready structured output.
@@ -268,6 +302,7 @@ OUTPUT CONTRACT:
     "Target_Service_Intent": "GTM | Accounting",
     "Forensic_Friction_Type": "API Stutter | Scale Friction | Manual Data Debt | Displacement Signal",
     "funding_signal": "string | null",
+    "Job_Title": "string — the exact role title from the job posting",
     "Contact_Recon": { "name": "string", "title": "string", "email": "string | null", "linkedin": "string | null" },
     "The_Divers": { "url_recon_notes": "string", "health_audit_notes": "string", "friction_notes": "string" }
     // All string values must be plain prose only. No reference markers of any kind.
@@ -307,6 +342,7 @@ app.post('/api/nemo', async (req, res) => {
     const contact_name = result?.Enriched_Lead?.Contact_Recon?.name || null;
     const contact_title = result?.Enriched_Lead?.Contact_Recon?.title || null;
     const linkedin_url = result?.Enriched_Lead?.Contact_Recon?.linkedin || null;
+    const job_title = result?.Enriched_Lead?.Job_Title || result?.Enriched_Lead?.job_title || null;
 
     const divers = result?.Enriched_Lead?.The_Divers;
     if (divers) {
@@ -347,8 +383,9 @@ app.post('/api/nemo', async (req, res) => {
              friction_notes = COALESCE($11, friction_notes),
              contact_name = $12,
              contact_title = $13,
-             linkedin_url = $14
-         WHERE session_id = $15`,
+             linkedin_url = $14,
+             job_title = $15
+         WHERE session_id = $16`,
         [
           JSON.stringify(result),
           sanitizeDirectUrl(lead.Direct_URL),
@@ -364,6 +401,7 @@ app.post('/api/nemo', async (req, res) => {
           contact_name,
           contact_title,
           linkedin_url,
+          job_title,
           session_id
         ]
       );
@@ -515,6 +553,18 @@ app.post('/api/reprocess', async (req, res) => {
     res.json({ status: 'reprocessed', session_id: input_session_id, company_name });
   } catch (err) {
     res.status(err.httpStatus || 500).json({ error: err.message });
+  }
+});
+
+app.post('/api/requeue', async (req, res) => {
+  try {
+    const result = await pool.query(
+      `SELECT session_id FROM gtm_career_leads WHERE contact_name IS NULL AND status = 'Finished' LIMIT 50`
+    );
+    const session_ids = result.rows.map(r => r.session_id);
+    res.json({ session_ids });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 });
 
