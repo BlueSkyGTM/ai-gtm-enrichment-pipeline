@@ -1,0 +1,21 @@
+# ============================================
+# outbound-pipeline/.gitignore
+# Public: framework/ + fleet-agents/CHANGELOG.md + fleet-agents/package.json
+# Private: everything else
+# ============================================
+
+# --- SOVEREIGN INFRASTRUCTURE ---
+pipeline/
+campaigns/
+
+# --- CREDENTIALS & RUNTIME SERVER ---
+fleet-agents/server.js
+
+# --- SECRETS ---
+*.env
+.env*
+**/sovereign_hub.md
+**/*.key
+**/*.pem
+**/credentials*.json
+**/service-account*.json
