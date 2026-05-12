@@ -1,4 +1,4 @@
-# Reverse-Clay-Engineering (formally PAFA)
+# TL;DR
 
 ### **A technical reconstruction of Clay's orchestration logic.**
 **1,000+ leads enriched per afternoon | Thousands of prompt simulations | Optimized on a Google Cloud stipend**
