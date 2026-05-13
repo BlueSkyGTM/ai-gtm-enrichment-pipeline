@@ -1,4 +1,4 @@
-# Reverse Engineering Clay
+# TL;DR
 
 A technical reconstruction of Clay-style GTM enrichment logic, built on a shoestring budget to understand how AI-assisted enrichment systems manage discovery, structured context, staged handoffs, failure states, and final payload generation.
 
