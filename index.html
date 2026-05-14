@@ -6,7 +6,7 @@
 <title>Raymond Fenton — RevOps · MarOps · Clay Systems</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;1,6..72,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
   --bg: #0A0A0A;
@@ -15,10 +15,13 @@
   --border: #1E1E1E;
   --border2: #2A2A2A;
   --text: #E6E6E6;
-  --text-soft: #B8B8B8;
+  --text-soft: #E6E6E6;
   --muted: #6A6A6A;
   --dim: #2E2E2E;
   --accent: #B9E36A;
+  --action: #76A1FF;
+  --action-soft: rgba(118,161,255,0.12);
+  --action-line: rgba(118,161,255,0.44);
   --red: #FF5555;
   --white: #FFFFFF;
 }
@@ -47,8 +50,8 @@ body::after {
 }
 
 /* Type primitives — mono is reserved for technical artifacts only */
-.mono { font-family: 'IBM Plex Mono', monospace; }
-.serif { font-family: 'Newsreader', 'Source Serif Pro', Georgia, serif; }
+.mono { font-family: 'DM Sans', sans-serif; }
+.serif { font-family: 'DM Sans', sans-serif; }
 
 /* NAV */
 nav {
@@ -69,7 +72,7 @@ nav {
   font-family: 'DM Sans', sans-serif;
   font-size: 13px;
   color: var(--text);
-  letter-spacing: -0.005em;
+  letter-spacing: 0;
   font-weight: 500;
 }
 .nav-id .sub { color: var(--muted); font-weight: 400; margin-left: 4px; }
@@ -92,7 +95,7 @@ nav {
 a:focus-visible,
 button:focus-visible,
 .term-row:focus-visible {
-  outline: 2px solid var(--accent);
+  outline: 2px solid var(--action);
   outline-offset: 4px;
 }
 
@@ -145,11 +148,11 @@ button:focus-visible,
 }
 
 .hero-pre {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'DM Sans', sans-serif;
   font-size: 11px;
   color: var(--muted);
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  text-transform: none;
   margin-bottom: 40px;
   display: flex;
   align-items: center;
@@ -164,11 +167,11 @@ button:focus-visible,
 }
 
 .hero-h1 {
-  font-family: 'Newsreader', serif;
-  font-size: clamp(56px, 7.4vw, 108px);
+  font-family: 'DM Sans', sans-serif;
+  font-size: clamp(48px, 6.6vw, 92px);
   line-height: 1.04;
-  letter-spacing: -0.035em;
-  font-weight: 400;
+  letter-spacing: 0;
+  font-weight: 500;
   margin-bottom: 40px;
   max-width: 16ch;
   font-optical-sizing: auto;
@@ -187,7 +190,7 @@ button:focus-visible,
   max-width: 620px;
   margin-bottom: 44px;
   font-weight: 300;
-  letter-spacing: -0.005em;
+  letter-spacing: 0;
 }
 .hero-sub .em { color: var(--accent); font-weight: 400; }
 
@@ -241,7 +244,7 @@ button:focus-visible,
   white-space: nowrap;
 }
 .ticker-item {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'DM Sans', sans-serif;
   font-size: 10px;
   color: var(--muted);
   padding: 0 28px;
@@ -273,30 +276,21 @@ button:focus-visible,
 .stat-cell:last-child { border-right: none; }
 
 .stat-n {
-  font-family: 'Newsreader', serif;
-  font-size: clamp(72px, 8vw, 116px);
-  font-weight: 300;
+  font-family: 'DM Sans', sans-serif;
+  font-size: clamp(56px, 6.5vw, 88px);
+  font-weight: 600;
   color: var(--white);
   line-height: 0.9;
-  letter-spacing: -0.04em;
+  letter-spacing: 0;
   font-optical-sizing: auto;
 }
-.stat-n small {
-  font-size: 0.45em;
-  color: var(--accent);
-  font-weight: 400;
-  vertical-align: top;
-  margin-right: 2px;
-  letter-spacing: 0;
-}
-
 .stat-d {
   font-family: 'DM Sans', sans-serif;
   font-size: 13px;
-  color: var(--text-soft);
+  color: var(--text);
   line-height: 1.5;
   font-weight: 400;
-  max-width: 220px;
+  max-width: 230px;
 }
 .stat-d b { color: var(--text); font-weight: 500; display: block; margin-bottom: 2px; }
 
@@ -304,16 +298,16 @@ button:focus-visible,
    STAGE 2 — PEAK
    ══════════════════════════════════════ */
 .peak {
-  padding: 120px 48px 96px;
+  padding: 104px 36px 88px;
   border-bottom: 1px solid var(--border);
 }
 
 .section-label {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'DM Sans', sans-serif;
   font-size: 10px;
   color: var(--accent);
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  text-transform: none;
   margin-bottom: 22px;
   display: flex;
   align-items: center;
@@ -326,16 +320,16 @@ button:focus-visible,
 }
 
 .peak-h2, .process-h2, .about-h2, .contact-h2 {
-  font-family: 'Newsreader', serif;
-  font-weight: 400;
-  font-size: clamp(44px, 5vw, 76px);
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 500;
+  font-size: clamp(38px, 4.4vw, 64px);
   line-height: 1.0;
-  letter-spacing: -0.03em;
+  letter-spacing: 0;
   margin-bottom: 32px;
   max-width: 18ch;
   font-optical-sizing: auto;
 }
-.peak-h2, .process-h2, .about-h2, .contact-h2 { font-size: clamp(44px, 5vw, 76px); }
+.peak-h2, .process-h2, .about-h2, .contact-h2 { font-size: clamp(38px, 4.4vw, 64px); }
 .peak-h2 em { font-style: normal; font-weight: 500; color: var(--accent); }
 
 .peak-lead {
@@ -343,15 +337,16 @@ button:focus-visible,
   color: var(--text);
   max-width: 640px;
   line-height: 1.6;
-  margin-bottom: 64px;
+  margin-bottom: 56px;
   font-weight: 300;
-  letter-spacing: -0.005em;
+  letter-spacing: 0;
 }
 .peak-lead .muted { color: var(--text-soft); }
 .peak-lead .em { color: var(--accent); }
 
 /* INTELLIGENCE TERMINAL */
 .terminal {
+  --lead-grid: 150px 190px 126px 140px minmax(360px, 0.95fr) minmax(380px, 1.05fr);
   border: 1px solid var(--border2);
   overflow: hidden;
   background: var(--surface);
@@ -372,7 +367,7 @@ button:focus-visible,
 .td-g { background: #28C840; }
 
 .term-title {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'DM Sans', sans-serif;
   font-size: 10px;
   color: var(--muted);
   margin: 0 auto;
@@ -381,51 +376,55 @@ button:focus-visible,
 
 .term-body {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 360px;
-  height: 480px;
+  grid-template-columns: minmax(0, 1.28fr) minmax(340px, 0.72fr);
+  height: 720px;
 }
 
 .term-list {
   overflow: auto;
   border-right: 1px solid var(--border);
 }
-.term-list::-webkit-scrollbar { width: 4px; }
-.term-list::-webkit-scrollbar-thumb { background: var(--border2); }
+.term-list::-webkit-scrollbar { width: 4px; height: 6px; }
+.term-list::-webkit-scrollbar-thumb { background: var(--action-line); }
+.term-detail::-webkit-scrollbar { width: 4px; }
+.term-detail::-webkit-scrollbar-thumb { background: var(--action-line); }
 
 .term-head {
   display: grid;
-  grid-template-columns: 140px 150px 130px 130px 110px 120px 96px 86px;
-  min-width: 1010px;
-  gap: 14px;
+  grid-template-columns: var(--lead-grid);
+  min-width: 1340px;
+  gap: 16px;
   padding: 11px 24px;
   border-bottom: 1px solid var(--border);
-  background: var(--surface2);
+  background: var(--surface);
   position: sticky;
   top: 0;
+  z-index: 3;
 }
 .term-head span {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 9px;
-  color: var(--dim);
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
+  display: block;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 10px;
+  color: var(--text-soft);
+  letter-spacing: 0;
+  font-weight: 600;
 }
 
 .term-row {
   display: grid;
-  grid-template-columns: 140px 150px 130px 130px 110px 120px 96px 86px;
-  min-width: 1010px;
-  gap: 14px;
-  padding: 15px 24px;
+  grid-template-columns: var(--lead-grid);
+  min-width: 1340px;
+  gap: 16px;
+  padding: 18px 24px;
   border-bottom: 1px solid var(--border);
   cursor: pointer;
-  transition: background 0.12s;
-  align-items: center;
+  transition: background .2s;
+  align-items: start;
 }
-.term-row:hover { background: var(--surface2); }
+.term-row:hover { background: rgba(118,161,255,0.07); }
 .term-row.on {
-  background: rgba(185,227,106,0.06);
-  box-shadow: inset 2px 0 0 var(--accent);
+  background: var(--action-soft);
+  box-shadow: inset 3px 0 0 var(--action);
 }
 
 .tr-co {
@@ -433,77 +432,126 @@ button:focus-visible,
   font-size: 13px;
   color: var(--text);
   font-weight: 500;
-  letter-spacing: -0.005em;
+  letter-spacing: 0;
 }
 
 .tr-name {
   font-family: 'DM Sans', sans-serif;
   font-size: 12px;
-  color: var(--muted);
+  color: var(--text-soft);
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  white-space: normal;
+  line-height: 1.35;
 }
-.tr-name b { color: var(--text); font-weight: 500; }
+.tr-name b {
+  display: block;
+  color: var(--text);
+  font-weight: 500;
+  margin-bottom: 3px;
+}
+.tr-name span {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
 
 .tr-cell {
   font-family: 'DM Sans', sans-serif;
   font-size: 12px;
-  color: var(--muted);
+  color: var(--text-soft);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+.tr-bite-cell {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--text);
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.tr-email-cell {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--text);
+  white-space: pre-line;
+  display: -webkit-box;
+  -webkit-line-clamp: 5;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.term-row.on .tr-bite-cell,
+.term-row.on .tr-email-cell { color: var(--text); }
 .tr-cell.good { color: var(--text); }
 .tr-cell.empty { color: var(--dim); }
 
 .tr-badge {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 9px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 10px;
   padding: 4px 8px;
   display: inline-block;
-  letter-spacing: 0.04em;
-  border: 1px solid rgba(185,227,106,0.35);
   color: var(--accent);
-  white-space: nowrap;
+  border: 1px solid rgba(185,227,106,0.45);
+  background: rgba(185,227,106,0.04);
+  font-weight: 500;
+  letter-spacing: 0;
 }
 
 .tr-fund {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 10px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
   color: var(--text);
-  letter-spacing: 0.02em;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  letter-spacing: 0;
+  font-weight: 500;
+  line-height: 1.45;
 }
 .tr-fund.empty { color: var(--dim); }
 
 .tr-status {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'DM Sans', sans-serif;
   font-size: 9px;
   color: var(--accent);
   text-align: right;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.04em;
 }
 .tr-status.warn { color: #d6b44c; }
 
 /* DETAIL */
 .term-detail {
-  padding: 22px;
-  overflow-y: auto;
+  padding: 26px;
+  overflow: auto;
   background: var(--surface2);
 }
-.term-detail::-webkit-scrollbar { width: 4px; }
-.term-detail::-webkit-scrollbar-thumb { background: var(--border2); }
-
+.term-detail .raw-card {
+  margin-bottom: 18px;
+}
+.term-detail .raw-card a {
+  color: var(--accent);
+  text-decoration: none;
+}
+.term-detail .raw-card a:hover {
+  text-decoration: underline;
+}
+.term-detail .raw-v .small {
+  color: var(--text);
+  font-size: 13px;
+}
+.term-detail .raw-v .d-fund {
+  display: block;
+  margin: 0;
+}
 .dl {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 9px;
-  color: var(--dim);
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  margin: 18px 0 6px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 10px;
+  color: var(--text);
+  letter-spacing: 0;
+  margin-bottom: 8px;
+  font-weight: 600;
 }
 .dl:first-child { margin-top: 0; }
 
@@ -513,39 +561,47 @@ button:focus-visible,
   color: var(--text);
   line-height: 1.5;
 }
-.dv .small { color: var(--muted); font-size: 12px; }
+.dv .small { color: var(--text); font-size: 12px; }
 .dv a { color: var(--accent); text-decoration: none; }
 .dv a:hover { text-decoration: underline; }
 
 .d-fund {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 10px;
-  color: var(--accent);
-  background: rgba(185,227,106,0.05);
-  border: 1px solid rgba(185,227,106,0.18);
-  padding: 8px 11px;
-  line-height: 1.5;
-  margin-top: 4px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  color: var(--text);
+  background: rgba(185,227,106,0.04);
+  border: 1px solid rgba(185,227,106,0.25);
+  padding: 10px 12px;
+  margin-bottom: 22px;
+  line-height: 1.45;
 }
 
 .d-bite {
-  font-family: 'Newsreader', serif;
-  font-size: 14px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
   color: var(--text);
-  line-height: 1.55;
-  padding: 14px 16px;
+  line-height: 1.62;
+  padding: 16px 18px;
   background: rgba(255,255,255,0.025);
   border-left: 2px solid var(--accent);
-  font-style: italic;
-  font-weight: 300;
-  margin-top: 4px;
+}
+
+.email-block {
+  margin-top: 18px;
+  padding: 20px 22px;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.026);
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.58;
+  white-space: pre-line;
 }
 
 /* ══════════════════════════════════════
    STAGE 3 — PROCESS (token comparison promoted)
    ══════════════════════════════════════ */
 .process {
-  padding: 120px 48px 96px;
+  padding: 104px 36px 88px;
   border-bottom: 1px solid var(--border);
   background: var(--surface);
 }
@@ -558,11 +614,12 @@ button:focus-visible,
   color: var(--text);
   max-width: 600px;
   line-height: 1.6;
-  margin-bottom: 72px;
+  margin-bottom: 56px;
   font-weight: 300;
-  letter-spacing: -0.005em;
+  letter-spacing: 0;
 }
 .process-lead .muted { color: var(--text-soft); }
+.process-lead .em { color: var(--accent); }
 
 /* PRIMARY EVIDENCE — Before / After */
 .evidence-head {
@@ -574,11 +631,11 @@ button:focus-visible,
   gap: 12px;
 }
 .evidence-eyebrow {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'DM Sans', sans-serif;
   font-size: 10px;
   color: var(--muted);
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  text-transform: none;
 }
 .evidence-eyebrow b { color: var(--accent); font-weight: 500; }
 
@@ -599,10 +656,10 @@ button:focus-visible,
 .tc-side.after { background: #0d0f08; }
 
 .tc-tag {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'DM Sans', sans-serif;
   font-size: 10px;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  text-transform: none;
   margin-bottom: 28px;
   display: flex;
   align-items: center;
@@ -613,11 +670,11 @@ button:focus-visible,
 .tc-tag .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
 
 .tc-headline {
-  font-family: 'Newsreader', serif;
+  font-family: 'DM Sans', sans-serif;
   font-size: 56px;
   font-weight: 300;
   line-height: 0.95;
-  letter-spacing: -0.03em;
+  letter-spacing: 0;
   margin-bottom: 6px;
   font-optical-sizing: auto;
 }
@@ -633,7 +690,7 @@ button:focus-visible,
 }
 
 .tc-code {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'DM Sans', sans-serif;
   font-size: 11px;
   line-height: 2;
   color: var(--muted);
@@ -687,21 +744,21 @@ button:focus-visible,
 .decision:hover { background: var(--surface2); }
 
 .dec-num {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'DM Sans', sans-serif;
   font-size: 10px;
   color: var(--text-soft);
-  letter-spacing: 0.16em;
+  letter-spacing: 0.06em;
   margin-bottom: 24px;
 }
 
 .dec-q {
-  font-family: 'Newsreader', serif;
+  font-family: 'DM Sans', sans-serif;
   font-size: 22px;
   font-weight: 500;
   color: var(--text);
   margin-bottom: 14px;
   line-height: 1.2;
-  letter-spacing: -0.015em;
+  letter-spacing: 0;
 }
 
 .dec-a {
@@ -715,17 +772,18 @@ button:focus-visible,
 
 /* FLOW DIAGRAM */
 .flow-wrap {
-  border: 1px solid var(--border);
+  border: 1px solid var(--border2);
   padding: 32px 36px;
-  background: var(--bg);
+  background: var(--surface2);
+  box-shadow: 0 40px 120px rgba(0,0,0,0.28);
 }
 
 .flow-caption {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'DM Sans', sans-serif;
   font-size: 10px;
   color: var(--muted);
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  text-transform: none;
   margin-bottom: 22px;
 }
 
@@ -738,7 +796,7 @@ button:focus-visible,
 }
 
 .flow-node {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'DM Sans', sans-serif;
   font-size: 11px;
   padding: 9px 16px;
   border: 1px solid var(--border2);
@@ -749,7 +807,7 @@ button:focus-visible,
 .flow-node.warm { border-color: rgba(185,227,106,0.35); color: var(--accent); }
 
 .flow-arrow {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'DM Sans', sans-serif;
   font-size: 12px;
   color: var(--dim);
   padding: 0 10px;
@@ -757,7 +815,7 @@ button:focus-visible,
 }
 
 .flow-note {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'DM Sans', sans-serif;
   font-size: 10px;
   color: var(--muted);
   line-height: 2;
@@ -766,8 +824,463 @@ button:focus-visible,
 }
 .flow-note .comment { color: var(--dim); }
 
+.workflow-map {
+  position: relative;
+  overflow-x: auto;
+  padding: 34px 20px 28px;
+  border: 1px solid rgba(255,255,255,0.06);
+  background:
+    radial-gradient(circle at 12px 12px, rgba(255,255,255,0.055) 1px, transparent 1px) 0 0 / 24px 24px,
+    linear-gradient(180deg, rgba(255,255,255,0.025), rgba(255,255,255,0.01));
+}
+.workflow-map::-webkit-scrollbar { height: 5px; }
+.workflow-map::-webkit-scrollbar-thumb { background: var(--action-line); }
+
+.wf-grid {
+  min-width: 1040px;
+  display: grid;
+  grid-template-columns: 86px repeat(7, minmax(98px, 1fr));
+  grid-template-rows: auto 38px auto;
+  align-items: center;
+  gap: 0 18px;
+  position: relative;
+}
+.wf-grid::before {
+  content: '';
+  position: absolute;
+  left: 42px;
+  right: 42px;
+  top: 52px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(185,227,106,0.5), rgba(255,255,255,0.18), transparent);
+  z-index: 0;
+}
+.wf-node {
+  position: relative;
+  z-index: 2;
+  min-height: 82px;
+  padding: 14px 14px 12px;
+  border: 1px solid var(--border2);
+  background: rgba(20,20,19,0.92);
+  box-shadow: 0 18px 44px rgba(0,0,0,0.28);
+}
+.wf-node.seed { border-radius: 999px; min-height: 62px; display: grid; place-items: center; text-align: center; }
+.wf-node.agent { border-color: rgba(185,227,106,0.38); }
+.wf-node.gate { border-color: rgba(255,255,255,0.25); }
+.wf-node.store { border-color: rgba(118,161,255,0.34); }
+.wf-kicker {
+  font-size: 9px;
+  color: var(--muted);
+  letter-spacing: 0.06em;
+  margin-bottom: 7px;
+}
+.wf-title {
+  font-size: 13px;
+  color: var(--text);
+  line-height: 1.2;
+  font-weight: 500;
+}
+.wf-sub {
+  margin-top: 7px;
+  font-size: 11px;
+  color: var(--text-soft);
+  line-height: 1.35;
+  font-weight: 300;
+}
+.wf-transfer {
+  position: relative;
+  z-index: 1;
+  align-self: stretch;
+}
+.wf-transfer::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  border-left: 1px solid rgba(118,161,255,0.42);
+}
+.wf-transfer::after {
+  content: '';
+  position: absolute;
+  left: calc(50% - 3px);
+  bottom: -1px;
+  width: 7px;
+  height: 7px;
+  border-right: 1px solid rgba(118,161,255,0.7);
+  border-bottom: 1px solid rgba(118,161,255,0.7);
+  transform: rotate(45deg);
+}
+.wf-chip {
+  position: relative;
+  z-index: 2;
+  min-height: 58px;
+  padding: 11px 12px;
+  border: 1px dashed rgba(118,161,255,0.36);
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.35;
+  background: rgba(118,161,255,0.055);
+}
+.wf-chip.warn {
+  border-color: rgba(255,180,90,0.36);
+  background: rgba(255,180,90,0.055);
+}
+.wf-chip strong { display: block; color: var(--accent); font-size: 11px; margin-bottom: 3px; font-weight: 500; }
+.wf-empty { visibility: hidden; }
+.wf-legend {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+  margin-top: 26px;
+}
+.wf-legend-item {
+  border-top: 1px solid var(--border);
+  padding-top: 14px;
+}
+.wf-legend-item b {
+  display: block;
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 500;
+  margin-bottom: 6px;
+}
+.wf-legend-item span {
+  display: block;
+  color: var(--text-soft);
+  font-size: 12px;
+  line-height: 1.45;
+  font-weight: 300;
+}
+@media (max-width: 760px) {
+  .wf-legend { grid-template-columns: 1fr; }
+}
+
+.prompt-lab {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 1px;
+  background: var(--border2);
+  border: 1px solid var(--border2);
+  min-height: 540px;
+  box-shadow: 0 40px 120px rgba(0,0,0,0.28);
+}
+.agent-tabs {
+  background: var(--surface);
+  padding: 18px;
+  display: grid;
+  gap: 10px;
+  align-content: start;
+}
+.agent-tab {
+  width: 100%;
+  text-align: left;
+  border: 1px solid var(--action-line);
+  border-left: 3px solid rgba(118,161,255,0.5);
+  background: rgba(255,255,255,0.022);
+  color: var(--text-soft);
+  padding: 16px 16px 15px;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  transition: border-color .2s, background .2s, color .2s, box-shadow .2s, transform .2s;
+}
+.agent-tab:hover,
+.agent-tab.on {
+  border-color: var(--action);
+  border-left-color: var(--action);
+  background: var(--action-soft);
+  color: var(--text);
+  transform: translateX(-2px);
+}
+.agent-tab.on { box-shadow: inset 3px 0 0 var(--action), 0 12px 30px rgba(0,0,0,0.22); }
+.agent-tab b {
+  display: block;
+  color: var(--text);
+  font-size: 18px;
+  font-weight: 500;
+  margin-bottom: 5px;
+}
+.agent-tab span {
+  display: block;
+  font-size: 12px;
+  line-height: 1.35;
+  color: var(--muted);
+}
+.prompt-panel {
+  background: var(--surface2);
+  padding: 28px;
+  min-width: 0;
+}
+.prompt-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 24px;
+  margin-bottom: 22px;
+}
+.prompt-title {
+  font-size: clamp(28px, 3vw, 42px);
+  color: var(--text);
+  line-height: 1;
+  font-weight: 500;
+}
+.prompt-subtitle {
+  margin-top: 9px;
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 500;
+}
+.prompt-meta {
+  color: var(--text);
+  border: 1px solid var(--border);
+  padding: 8px 10px;
+  font-size: 11px;
+  white-space: nowrap;
+}
+.prompt-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-bottom: 0;
+}
+.prompt-box {
+  border: 1px solid var(--border);
+  background: rgba(0,0,0,0.12);
+  padding: 16px;
+}
+.prompt-box.full { grid-column: 1 / -1; }
+.prompt-box.highlight {
+  border-color: rgba(185,227,106,0.28);
+  background: rgba(185,227,106,0.035);
+}
+.prompt-box.action {
+  border-color: var(--action-line);
+  background: var(--action-soft);
+}
+.prompt-box b {
+  display: block;
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 500;
+  margin-bottom: 9px;
+}
+.prompt-box p,
+.prompt-box li {
+  color: var(--text);
+  font-size: 13px;
+  line-height: 1.55;
+  font-weight: 300;
+}
+.prompt-box ul { margin: 0; padding-left: 18px; }
+.prompt-code {
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--text);
+  white-space: pre-wrap;
+  letter-spacing: 0;
+}
+.prompt-code strong { color: var(--accent); font-weight: 500; }
+@media (max-width: 900px) {
+  .prompt-lab { grid-template-columns: 1fr; }
+  .prompt-grid { grid-template-columns: 1fr; }
+  .prompt-box.full { grid-column: auto; }
+  .prompt-top { flex-direction: column; }
+}
+
+
+.forensic-lab {
+  border: 1px solid var(--border2);
+  background: var(--surface2);
+  box-shadow: 0 40px 120px rgba(0,0,0,0.28);
+  display: grid;
+  grid-template-columns: minmax(270px, 0.86fr) minmax(310px, 0.94fr) minmax(440px, 1.24fr);
+  min-height: 600px;
+}
+.forensic-panel {
+  padding: 24px;
+  border-right: 1px solid var(--border);
+  position: relative;
+}
+.forensic-panel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--action), rgba(118,161,255,0.08));
+}
+.forensic-panel:last-child { border-right: 0; }
+.fp-label {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 16px;
+}
+.fp-title {
+  font-size: 22px;
+  line-height: 1.14;
+  color: var(--text);
+  font-weight: 500;
+  margin-bottom: 12px;
+}
+.fp-copy {
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.55;
+  font-weight: 300;
+}
+.raw-card,
+.diagnostic-card,
+.message-card {
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.026);
+  padding: 18px;
+  margin-top: 18px;
+}
+.raw-row {
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border);
+}
+.raw-row:last-child { border-bottom: 0; padding-bottom: 0; }
+.raw-k {
+  font-family: 'DM Sans', sans-serif;
+  color: var(--text);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.raw-v {
+  color: var(--text);
+  font-size: 15px;
+  line-height: 1.42;
+  font-weight: 400;
+}
+.raw-v strong { color: var(--accent); font-weight: 500; }
+.dictionary-stack {
+  display: grid;
+  gap: 9px;
+  margin-top: 16px;
+}
+.dictionary-btn {
+  border: 1px solid var(--action-line);
+  border-left: 3px solid rgba(118,161,255,0.62);
+  background: rgba(255,255,255,0.028);
+  color: var(--text);
+  text-align: left;
+  padding: 13px 15px;
+  min-height: 68px;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  transition: border-color .2s ease, background .2s ease, transform .2s ease, box-shadow .2s ease;
+}
+.dictionary-btn:hover,
+.dictionary-btn.on {
+  border-color: var(--action);
+  border-left-color: var(--action);
+  background: var(--action-soft);
+  box-shadow: 0 0 0 1px rgba(118,161,255,0.16), 0 14px 34px rgba(0,0,0,0.22);
+  transform: translateX(2px);
+}
+.dictionary-btn b {
+  display: block;
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.dictionary-btn span {
+  display: block;
+  color: var(--text);
+  font-size: 12px;
+  line-height: 1.42;
+  font-weight: 300;
+}
+.diagnostic-card {
+  border-left: 3px solid var(--accent);
+  background: rgba(185,227,106,0.035);
+}
+.diag-name {
+  color: var(--accent);
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+.diag-copy,
+.diag-use {
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.55;
+}
+.diag-use {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+}
+.diag-use b { color: var(--accent); font-weight: 500; }
+.payload-mini {
+  margin-top: 18px;
+  border: 1px solid rgba(185,227,106,0.22);
+  background: rgba(185,227,106,0.045);
+  padding: 16px;
+}
+.payload-mini code {
+  display: block;
+  white-space: pre-wrap;
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  line-height: 1.55;
+}
+.message-split {
+  display: grid;
+  grid-template-columns: 0.86fr 1.14fr;
+  gap: 12px;
+  margin-top: 16px;
+}
+.message-card.before { border-color: rgba(255,255,255,0.14); }
+.message-card.after {
+  border-color: rgba(185,227,106,0.32);
+  background: rgba(185,227,106,0.035);
+}
+.msg-tag {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 12px;
+}
+.message-card.before .msg-tag { color: var(--text); }
+.msg-body {
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.58;
+  white-space: pre-line;
+}
+.after .msg-body {
+  font-size: 15px;
+  line-height: 1.62;
+}
+.bite-card {
+  margin-top: 18px;
+  border-left: 2px solid var(--accent);
+  background: rgba(255,255,255,0.026);
+  padding: 18px 20px;
+}
+.bite-card .msg-body { font-size: 16px; line-height: 1.55; }
+@media (max-width: 1100px) {
+  .forensic-lab { grid-template-columns: 1fr; }
+  .forensic-panel { border-right: 0; border-bottom: 1px solid var(--border); }
+  .forensic-panel:last-child { border-bottom: 0; }
+  .message-split { grid-template-columns: 1fr; }
+}
+
 /* ══════════════════════════════════════
-   STAGE 4 — ABOUT
+   STAGE 5 — ABOUT
    ══════════════════════════════════════ */
 .about {
   padding: 120px 48px 96px;
@@ -786,7 +1299,7 @@ button:focus-visible,
   color: var(--text);
   line-height: 1.7;
   font-weight: 300;
-  letter-spacing: -0.005em;
+  letter-spacing: 0;
 }
 .about-body p { margin-bottom: 22px; }
 .about-body p:last-child { margin-bottom: 0; }
@@ -815,7 +1328,7 @@ button:focus-visible,
 .cred:hover { background: var(--surface2); }
 
 .cred-icon {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'DM Sans', sans-serif;
   font-size: 10px;
   color: var(--accent);
   padding-top: 4px;
@@ -828,7 +1341,7 @@ button:focus-visible,
   font-weight: 500;
   font-size: 14px;
   margin-bottom: 4px;
-  letter-spacing: -0.005em;
+  letter-spacing: 0;
 }
 .cred-text span {
   color: var(--text-soft);
@@ -844,7 +1357,7 @@ button:focus-visible,
 }
 
 .tag {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'DM Sans', sans-serif;
   font-size: 10px;
   padding: 5px 11px;
   border: 1px solid var(--border2);
@@ -887,7 +1400,7 @@ button:focus-visible,
   font-weight: 300;
   margin-bottom: 40px;
   max-width: 540px;
-  letter-spacing: -0.005em;
+  letter-spacing: 0;
 }
 .contact-sub .muted { color: var(--text-soft); }
 
@@ -927,22 +1440,22 @@ button:focus-visible,
 .contact-link:hover { background: var(--surface2); }
 
 .cl-label {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'DM Sans', sans-serif;
   font-size: 10px;
   color: var(--text-soft);
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  text-transform: none;
 }
 
 .cl-val {
   font-family: 'DM Sans', sans-serif;
   font-size: 14px;
   color: var(--text);
-  letter-spacing: -0.005em;
+  letter-spacing: 0;
 }
 
 .cl-arrow {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'DM Sans', sans-serif;
   font-size: 12px;
   color: var(--dim);
   justify-self: end;
@@ -959,14 +1472,14 @@ footer {
 }
 
 .footer-left {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'DM Sans', sans-serif;
   font-size: 10px;
   color: var(--text-soft);
   letter-spacing: 0.06em;
 }
 
 .footer-quote {
-  font-family: 'Newsreader', serif;
+  font-family: 'DM Sans', sans-serif;
   font-size: 14px;
   font-style: italic;
   color: var(--muted);
@@ -993,10 +1506,171 @@ footer {
   .peak, .process, .about, .contact { padding: 80px 24px 64px; }
   .decisions, .token-compare { grid-template-columns: 1fr; }
   .term-body { grid-template-columns: 1fr; height: auto; }
-  .term-detail { height: 320px; }
-  .term-head, .term-row { grid-template-columns: 130px 150px 120px 120px 100px 110px 90px 80px; gap: 12px; padding-left: 18px; padding-right: 18px; }
+  .term-detail { height: 420px; overflow: auto; }
+  .term-head, .term-row { grid-template-columns: 140px 170px 120px 140px 360px 360px; min-width: 1290px; gap: 12px; padding-left: 18px; padding-right: 18px; }
   .about, .contact { grid-template-columns: 1fr; gap: 48px; }
   footer { flex-direction: column; gap: 16px; padding: 28px 24px; text-align: center; }
+}
+
+/* Interaction Upgrade: Plumbing + Prompts */
+.flow-stage {
+  display: grid;
+  grid-template-columns: minmax(0, 1.28fr) minmax(300px, 0.72fr);
+  gap: 1px;
+  border: 1px solid var(--border2);
+  background: var(--border2);
+  box-shadow: 0 40px 120px rgba(0,0,0,0.28);
+}
+.workflow-map {
+  border: 0;
+  min-height: 360px;
+}
+.workflow-map.has-panel {
+  padding: 34px 22px 30px;
+}
+.wf-grid {
+  grid-template-rows: auto 34px auto;
+}
+.wf-node {
+  font-family: 'DM Sans', sans-serif;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color .2s, background .2s, transform .2s, box-shadow .2s;
+}
+.wf-node:hover,
+.wf-node.on {
+  border-color: var(--action);
+  background: rgba(118,161,255,0.12);
+  transform: translateY(-2px);
+}
+.wf-node.on {
+  box-shadow: inset 0 3px 0 var(--action), 0 18px 44px rgba(0,0,0,0.34);
+}
+.wf-node.agent.on { border-color: var(--accent); background: rgba(185,227,106,0.08); }
+.wf-node:focus-visible {
+  outline: 2px solid var(--action);
+  outline-offset: 3px;
+}
+.wf-chip {
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color .2s, background .2s, color .2s, transform .2s;
+}
+.wf-chip:hover,
+.wf-chip.on {
+  border-color: var(--action);
+  background: rgba(118,161,255,0.12);
+  color: var(--text);
+  transform: translateY(-1px);
+}
+.wf-chip.on strong { color: var(--accent); }
+.wf-detail {
+  background: var(--surface2);
+  padding: 24px;
+  border-left: 1px solid var(--border2);
+  min-height: 360px;
+  overflow: auto;
+}
+.wf-detail .raw-card { margin-bottom: 18px; }
+.wf-detail .raw-v strong { color: var(--accent); }
+.wf-detail .d-bite { font-size: 14px; }
+.wf-detail-title {
+  font-size: clamp(28px, 3vw, 42px);
+  color: var(--text);
+  line-height: 1;
+  font-weight: 500;
+  margin-bottom: 10px;
+}
+.wf-detail-sub {
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 18px;
+}
+.wf-legend {
+  grid-column: 1 / -1;
+}
+.prompt-lab {
+  grid-template-columns: minmax(0, 1fr) 300px;
+}
+.agent-tabs {
+  background: var(--surface2);
+}
+.agent-tab {
+  border-color: var(--border2);
+  border-left-color: rgba(185,227,106,0.34);
+  background: rgba(255,255,255,0.026);
+}
+.agent-tab:hover,
+.agent-tab.on {
+  border-color: var(--action);
+  border-left-color: var(--action);
+  background: var(--action-soft);
+}
+.prompt-panel {
+  background: var(--surface2);
+}
+.prompt-grid {
+  grid-template-columns: minmax(220px, 0.86fr) minmax(240px, 1fr) minmax(240px, 1fr);
+}
+.prompt-box {
+  background: rgba(255,255,255,0.026);
+}
+.prompt-box.action {
+  border-color: var(--border);
+  background: rgba(255,255,255,0.026);
+}
+.prompt-box.persona {
+  border-color: rgba(185,227,106,0.32);
+  background: rgba(185,227,106,0.045);
+}
+.prompt-box.persona b,
+.prompt-box.highlight b { color: var(--accent); }
+@media (max-width: 980px) {
+  .flow-stage { grid-template-columns: 1fr; }
+  .wf-detail { border-left: 0; border-top: 1px solid var(--border2); min-height: 0; }
+}
+
+.flow-wrap {
+  text-align: center;
+}
+.flow-stage {
+  text-align: left;
+}
+.workflow-map .wf-grid {
+  margin-left: auto;
+  margin-right: auto;
+}
+/* Final Readability Overrides */
+.wf-sub,
+.wf-chip,
+.wf-legend-item span,
+.agent-tab span {
+  color: var(--text);
+}
+.wf-chip strong {
+  color: var(--accent);
+}
+.prompt-box.action {
+  border-color: var(--border);
+  background: rgba(255,255,255,0.026);
+}
+.prompt-code {
+  background: rgba(0,0,0,0.18);
+  border: 1px solid var(--border);
+  padding: 16px;
+}
+/* Plumbing Tightening */
+.workflow-map::after {
+  content: none !important;
+}
+.workflow-map.has-panel {
+  min-height: 360px !important;
+  padding: 24px 18px 18px !important;
+}
+.wf-detail {
+  min-height: 360px !important;
 }
 </style>
 </head>
@@ -1007,29 +1681,31 @@ footer {
   <div class="nav-id">Raymond Fenton <span class="sub">— RevOps · MarOps · Clay Systems</span></div>
   <div class="nav-right">
     <ul class="nav-links">
-      <li><a href="#result">Result</a></li>
-      <li><a href="#output">Output</a></li>
-      <li><a href="#process">Process</a></li>
-      <li><a href="#about">About</a></li>
+      <li><a href="#output">Payload</a></li>
+      <li><a href="#playbook">Playbook</a></li>
+      <li><a href="#process">Plumbing</a></li>
+      <li><a href="#agents">Prompts</a></li>
+      <li><a href="#contact">Operator</a></li>
     </ul>
-    <a href="mailto:raymondf.gtm@gmail.com" class="nav-contact">Get in touch →</a>
+    <a href="mailto:raymondf.gtm@gmail.com" class="nav-contact">Get in Touch →</a>
   </div>
 </nav>
-  
+
 <!-- ══ STAGE 1: HERO ══ -->
 <section class="hero">
   <div class="hero-grid"></div>
   <div class="hero-inner">
     <div class="hero-pre reveal">RevOps · MarOps · CRM-Ready Automation</div>
     <h1 class="hero-h1 reveal">
-      <em>Reverse Engineering Clay.</em><br>
-      <span class="faded">45 Days Building The Enrichment Engine Backwards.</span>
+      <span>45-Days Reverse Engineering Clay.</span><br>
+      <em>Building the Enrichment Engine Backwards.</em>
     </h1>
     <p class="hero-sub reveal">
-      To understand what Clay's enrichment columns actually do at the model level, I rebuilt the workflow from scratch on a shoestring budget — then translated the lessons back into Clay-style tables, HubSpot-ready payloads, and operational handoff design.
+      To understand Clay enrichment at the model level, I rebuilt the workflow from scratch on a shoestring budget — then translated the lessons into Clay-style tables, HubSpot-ready payloads, and operational handoff design.
     </p>
     <div class="hero-btns reveal">
-      <a href="#result" class="btn-a">See the result ↓</a>
+      <a href="#output" class="btn-a">Inspect the payload ↓</a>
+      <a href="https://github.com/BlueSkyGTM/reverse-engineering-clay" class="btn-b">View repo →</a>
     </div>
   </div>
 </section>
@@ -1038,74 +1714,28 @@ footer {
 <div class="stat-bar reveal">
   <div class="stat-cell">
     <div class="stat-n">45</div>
-    <div class="stat-d"><b>Days of testing</b>Hundreds of prompt configs. Every failure documented.</div>
+    <div class="stat-d"><b>Days of Testing</b>Hundreds of prompt configs. Every failure documented.</div>
   </div>
   <div class="stat-cell">
     <div class="stat-n">1,500</div>
-    <div class="stat-d"><b>Leads enriched per day</b>Fifty every ten minutes, autonomous.</div>
+    <div class="stat-d"><b>Tested Run Capacity</b>Stress-tested at 1,500 records in an afternoon.</div>
   </div>
   <div class="stat-cell">
-    <div class="stat-n"><small>$</small>300</div>
-    <div class="stat-d"><b>Total budget</b>One Google Cloud stipend. One $20 Claude plan.</div>
+    <div class="stat-n">$300</div>
+    <div class="stat-d"><b>Total Budget</b>One Google Cloud stipend. One $20 Claude plan.</div>
   </div>
   <div class="stat-cell">
     <div class="stat-n">18</div>
-    <div class="stat-d"><b>Failure modes resolved</b>Every one shipped to the changelog.</div>
+    <div class="stat-d"><b>Failure Modes Resolved</b>Every one shipped to the changelog.</div>
   </div>
 </div>
 
-<!-- ══ STAGE 2: PEAK — THE RESULT (TOKENS) ══ -->
-<section class="peak" id="result">
-  <div class="section-label reveal" data-num="01">The Result</div>
-  <h2 class="peak-h2 reveal"><em>8,000 Tokens</em> Per Node.<br>Now <em>Twelve.</em></h2>
-  <p class="peak-lead reveal">
-    The biggest single fix in 45 days of testing. <span class="muted">Same workflow. Same enrichment logic. Different handoff model — and the failures stopped.</span> This is the kind of systems thinking I bring to RevOps, MarOps, CRM cleanup, and marketing automation.
-  </p>
-
-  <div class="evidence-head reveal">
-    <div class="evidence-eyebrow"><b>Decision 01</b> · Push model → Pull model</div>
-    <div class="evidence-eyebrow">Token cost per node handoff</div>
-  </div>
-  <div class="token-compare reveal">
-    <div class="tc-side before">
-      <div class="tc-tag before"><span class="dot"></span>Before — push model</div>
-      <div class="tc-headline">8,000<span class="unit">tokens / node</span></div>
-      <div class="tc-sub">n8n was the cargo truck. Every node carried the full lead payload.</div>
-      <div class="tc-code">
-        <span class="node">Discovery</span><span class="arrow">→</span><span class="bad">{ company, job_url, signals[], health[], logs[] }</span><br>
-        <span class="node">Enrichment</span><span class="arrow">→</span><span class="bad">{ ...discovery, contact, proof_urls[] }</span><br>
-        <span class="node">Render</span><span class="arrow">→</span><span class="bad">{ ...enrichment, final_payload, log }</span>
-      </div>
-      <div class="tc-bullets">
-        <div class="tc-bullet">n8n expression failures on every large batch</div>
-        <div class="tc-bullet">Gemini context corruption mid-pipeline</div>
-        <div class="tc-bullet">Silent data loss between handoffs</div>
-      </div>
-    </div>
-    <div class="tc-side after">
-      <div class="tc-tag after"><span class="dot"></span>After — pull model</div>
-      <div class="tc-headline">12<span class="unit">tokens / node</span></div>
-      <div class="tc-sub">Agents pull their own data. n8n passes only a session_id.</div>
-      <div class="tc-code">
-        <span class="node">Discovery</span><span class="arrow">→</span><span class="good">{ session_ids[] }</span><br>
-        <span class="node">Enrichment</span><span class="arrow">→</span><span class="good">{ status, session_id }</span><br>
-        <span class="node">Render</span><span class="arrow">→</span><span class="good">{ status, session_id }</span>
-      </div>
-      <div class="tc-bullets">
-        <div class="tc-bullet">Zero expression failures across 1,500 leads/day</div>
-        <div class="tc-bullet">Each agent owns its own context window</div>
-        <div class="tc-bullet">n8n is the starter pistol, not the engine</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ══ STAGE 3: OUTPUT — THE TABLE ══ -->
+<!-- ══ STAGE 2: OUTPUT — THE TABLE ══ -->
 <section class="peak" id="output">
-  <div class="section-label reveal" data-num="02">The Output</div>
-  <h2 class="peak-h2 reveal">Real GTM Signals. <em>Clean Handoffs.</em></h2>
+  <div class="section-label reveal" data-num="01">The Payload</div>
+  <h2 class="peak-h2 reveal">Clean Waterfall <em>Enrichment.</em></h2>
   <p class="peak-lead reveal">
-    Companies, contacts, funding signals, friction types, and handoff-ready GTM payloads — the kind of structured record Clay can prepare and HubSpot can receive. <span class="em">Select any row.</span>
+    Companies, contacts, funding signals, friction types, and handoff-ready GTM payloads — the kind of structured record Clay can prepare and HubSpot can receive. <span class="em">Funded examples show the curated hook directly. Select any row to open the full payload.</span>
   </p>
 
   <div class="terminal reveal">
@@ -1113,140 +1743,200 @@ footer {
       <div class="td td-r"></div>
       <div class="td td-y"></div>
       <div class="td td-g"></div>
-      <div class="term-title">GTM Career Leads · Status = Finished · HubSpot-ready review view</div>
+      <div class="term-title">GTM Career Leads · Funded Samples · HubSpot-ready review view</div>
     </div>
     <div class="term-body">
       <div class="term-list">
         <div class="term-head">
-          <span>Company</span>
-          <span>Contact</span>
-          <span>Role</span>
-          <span>Email</span>
-          <span>LinkedIn</span>
-          <span>Funding signal</span>
-          <span>Friction</span>
-          <span style="text-align:right">Status</span>
+          <span>company</span>
+          <span>contact</span>
+          <span>primary_signal</span>
+          <span>funding_signal</span>
+          <span>hook</span>
+          <span>outreach_email</span>
         </div>
         <div id="term-rows"></div>
       </div>
       <div class="term-detail" id="term-detail">
-        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--dim);text-align:center;padding:120px 0;line-height:2;">// select a row<br>to view intelligence</div>
+        <div style="font-family:'DM Sans',sans-serif;font-size:10px;color:var(--text-soft);text-align:center;padding:120px 0;line-height:2;">// select any row<br>to view the full hook</div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ══ STAGE 4: PROCESS — HOW I THINK ══ -->
-<section class="process" id="process">
-  <div class="section-label reveal" data-num="03">How I Think</div>
-  <h2 class="process-h2 reveal">Constraints <em>Reframed.</em></h2>
+<!-- ══ STAGE 3: PLAYBOOK ══ -->
+<section class="process" id="playbook">
+  <div class="section-label reveal" data-num="02">The Playbook</div>
+  <h2 class="process-h2 reveal">The Forensic Dictionary. <em>Stranger to Friend.</em></h2>
   <p class="process-lead reveal">
-    Architecture constraints are just problems that haven't been reframed yet. <span class="muted">Two more decisions worth seeing.</span>
+    Job listings expose operational pressure. The play is to classify the pressure, keep funding as a health check, hand the compact diagnosis to the writer, and turn a cold row into a message that sounds like it came from inside the room. <span class="em">Select a dictionary signal to watch it become a payload, hook, and finished email.</span>
   </p>
 
-  <div class="decisions reveal" style="grid-template-columns: 1fr 1fr;">
-    <div class="decision">
-      <div class="dec-num">DECISION 02</div>
-      <div class="dec-q">Why Typed Output Contracts?</div>
-      <p class="dec-a">The enrichment JSON was nondeterministic — different key names, different nesting, different field locations every run. The normalization layer had seven fallback paths just to find an email. <strong>The fix: an output contract at the stage boundary.</strong> The model treats it as ground truth. Normalization collapsed from seven paths to one.</p>
-    </div>
-      <div class="decision">
-        <div class="dec-num">DECISION 03</div>
-        <div class="dec-q">Why The Parser Layer?</div>
-        <p class="dec-a">The practical problem was not the language or framework. It was messy payloads moving between tools. The parser layer normalized n8n input, stripped bad URLs and citation noise, and made each row usable before it reached the next stage.</p>
+  <div class="forensic-lab reveal">
+    <div class="forensic-panel">
+      <div class="fp-label">Stranger Signal</div>
+      <div class="fp-title">A Raw Row Becomes Useful When the Pressure is Named.</div>
+      <p class="fp-copy">The source starts cold: a direct job listing, tool references, and public momentum. The play is finding the pressure hiding inside it.</p>
+      <div class="raw-card">
+        <div class="raw-row">
+          <div class="raw-k">Company</div>
+          <div class="raw-v"><strong>Crux Climate</strong> · cruxclimate.com</div>
+        </div>
+        <div class="raw-row">
+          <div class="raw-k">Role Signal</div>
+          <div class="raw-v">Marketing Ops Associate</div>
+        </div>
+        <div class="raw-row">
+          <div class="raw-k">Listing Evidence</div>
+          <div class="raw-v">Build HubSpot workflows. Maintain prospecting lists using Clay, Apollo, and HubSpot.</div>
+        </div>
+        <div class="raw-row">
+          <div class="raw-k">Funding Signal</div>
+          <div class="raw-v"><strong>$50M Series B</strong> · Apr 2025</div>
+        </div>
       </div>
+    </div>
+
+    <div class="forensic-panel">
+      <div class="fp-label">Forensic Dictionary</div>
+      <div class="fp-title">Five Checks. One Diagnosis.</div>
+      <p class="fp-copy">The dictionary does not write the message. It gives the receiving bot a clean diagnosis so the hook can mirror the right frustration.</p>
+      <div class="dictionary-stack" role="tablist" aria-label="Forensic dictionary selector">
+        <button class="dictionary-btn on" type="button" data-friction="api"><b>API Stutter</b><span>Tools exist, but the handoffs do not flow automatically.</span></button>
+        <button class="dictionary-btn" type="button" data-friction="scale"><b>Scale Friction</b><span>Growth is outrunning the operating system underneath it.</span></button>
+        <button class="dictionary-btn" type="button" data-friction="manual"><b>Manual Data Debt</b><span>Humans are doing work the table should structure or automate.</span></button>
+        <button class="dictionary-btn" type="button" data-friction="displacement"><b>Displacement Signal</b><span>A platform, tool, or generalist is being paid for specialist work.</span></button>
+        <button class="dictionary-btn" type="button" data-friction="funding"><b>Funding Signal</b><span>Use public momentum only when it exists. Null means omit it.</span></button>
+      </div>
+      <div class="diagnostic-card" id="forensic-diagnostic"></div>
+    </div>
+
+    <div class="forensic-panel">
+      <div class="fp-label">From Hook to Email</div>
+      <div class="fp-title">The Message Works When it Mirrors the Private Frustration.</div>
+      <div class="payload-mini"><code id="forensic-payload"></code></div>
+      <div class="bite-card">
+        <div class="msg-tag">Hook</div>
+        <div class="msg-body" id="forensic-hook"></div>
+      </div>
+      <div class="message-split">
+        <div class="message-card before">
+          <div class="msg-tag">Before</div>
+          <div class="msg-body">Hi there,
+
+I saw your Marketing Ops role and thought my background in Clay, HubSpot, and GTM systems could be useful.
+
+Would you be open to chatting?</div>
+        </div>
+        <div class="message-card after">
+          <div class="msg-tag">After</div>
+          <div class="msg-body" id="forensic-email"></div>
+        </div>
+      </div>
+    </div>
   </div>
+</section>
+
+<!-- ══ STAGE 4: PLUMBING ══ -->
+<section class="process" id="process">
+  <div class="section-label reveal" data-num="03">The Plumbing</div>
+  <h2 class="process-h2 reveal">Find. Extract. Transform. <em>Export.</em></h2>
+  <p class="process-lead reveal">
+    This is the handoff machine behind the payload. <span class="em">Each node finds evidence, cleans the record, diagnoses the friction, or preserves context for the next stage. Select any node or memory chip to inspect the handoff.</span>
+  </p>
 
   <div class="flow-wrap reveal">
-    <div class="flow-caption">// staged context architecture</div>
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-bottom:28px;">
-      <div>
-        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--accent);letter-spacing:0.06em;margin-bottom:6px;">Discovery</div>
-        <div style="font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text-soft);line-height:1.55;font-weight:300;">Finds companies from live job postings and returns structured source signals.</div>
+    <div class="flow-caption">// Interactive Backend Workflow Map</div>
+    <div class="flow-stage">
+      <div class="workflow-map has-panel" aria-label="Clickable backend enrichment workflow map">
+        <div class="wf-grid">
+          <button class="wf-node seed on" type="button" data-flow="ignition" style="grid-column:1;grid-row:1;">
+            <div>
+              <div class="wf-kicker">Trigger</div>
+              <div class="wf-title">Engine Ignition</div>
+            </div>
+          </button>
+          <button class="wf-node" type="button" data-flow="config" style="grid-column:2;grid-row:1;">
+            <div class="wf-kicker">Input</div>
+            <div class="wf-title">Campaign Config</div>
+            <div class="wf-sub">Target, message, and source rules.</div>
+          </button>
+          <button class="wf-node agent" type="button" data-flow="ahab" style="grid-column:3;grid-row:1;">
+            <div class="wf-kicker">Agent</div>
+            <div class="wf-title">Ahab</div>
+            <div class="wf-sub">Finds source signals and creates the first structured record.</div>
+          </button>
+          <button class="wf-node gate" type="button" data-flow="parser" style="grid-column:4;grid-row:1;">
+            <div class="wf-kicker">Parser</div>
+            <div class="wf-title">Record Parser</div>
+            <div class="wf-sub">Turns messy output into rows the next stage can trust.</div>
+          </button>
+          <button class="wf-node store" type="button" data-flow="router" style="grid-column:5;grid-row:1;">
+            <div class="wf-kicker">Gate</div>
+            <div class="wf-title">Exclusion Router</div>
+            <div class="wf-sub">Duplicates, dead links, and bad fits branch out before enrichment.</div>
+          </button>
+          <button class="wf-node agent" type="button" data-flow="nemo" style="grid-column:6;grid-row:1;">
+            <div class="wf-kicker">Agent</div>
+            <div class="wf-title">Nemo</div>
+            <div class="wf-sub">Converts fragments into diagnosis and next-stage context.</div>
+          </button>
+          <button class="wf-node agent" type="button" data-flow="neptune" style="grid-column:7;grid-row:1;">
+            <div class="wf-kicker">Agent</div>
+            <div class="wf-title">Neptune</div>
+            <div class="wf-sub">Stitches useful context into one handoff-ready record.</div>
+          </button>
+          <button class="wf-node store" type="button" data-flow="payload" style="grid-column:8;grid-row:1;">
+            <div class="wf-kicker">Output</div>
+            <div class="wf-title">Payload Table</div>
+            <div class="wf-sub">Final GTM row for review, Clay work, or CRM prep.</div>
+          </button>
+
+          <div class="wf-transfer" style="grid-column:3;grid-row:2;"></div>
+          <div class="wf-transfer" style="grid-column:5;grid-row:2;"></div>
+          <div class="wf-transfer" style="grid-column:6;grid-row:2;"></div>
+          <div class="wf-transfer" style="grid-column:7;grid-row:2;"></div>
+
+          <button class="wf-chip" type="button" data-flow="ahabMemory" style="grid-column:3;grid-row:3;"><strong>Ahab Memory</strong>Source Facts, Job-Page Clues</button>
+          <button class="wf-chip warn" type="button" data-flow="shipwreck" style="grid-column:5;grid-row:3;"><strong>Shipwreck Log</strong>Bad Rows Kept Out of Final Output</button>
+          <button class="wf-chip" type="button" data-flow="nemoMemory" style="grid-column:6;grid-row:3;"><strong>Nemo Memory</strong>Diagnosis, Friction Type, Context</button>
+          <button class="wf-chip" type="button" data-flow="neptuneMemory" style="grid-column:7;grid-row:3;"><strong>Neptune Memory</strong>Final Handoff Rules</button>
+        </div>
       </div>
-      <div>
-        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--accent);letter-spacing:0.06em;margin-bottom:6px;">Diagnostic Enrichment</div>
-        <div style="font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text-soft);line-height:1.55;font-weight:300;">Pulls funding, stack, contact, and intent into a typed enrichment payload.</div>
-      </div>
-      <div>
-        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--accent);letter-spacing:0.06em;margin-bottom:6px;">Final Render</div>
-        <div style="font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text-soft);line-height:1.55;font-weight:300;">Turns the compact enrichment brief into a handoff-ready payload.</div>
-      </div>
+      <div class="wf-detail" id="workflow-detail" aria-live="polite"></div>
     </div>
-    <div class="flow">
-      <div class="flow-node warm">Engine_Ignition</div>
-      <div class="flow-arrow">→</div>
-      <div class="flow-node">Set_Campaign_Message</div>
-      <div class="flow-arrow">→</div>
-      <div class="flow-node warm">Discovery_Call</div>
-      <div class="flow-arrow">→</div>
-      <div class="flow-node">Parse_Session_IDs</div>
-      <div class="flow-arrow">→</div>
-      <div class="flow-node warm">Enrichment_Call</div>
-      <div class="flow-arrow">→</div>
-      <div class="flow-node warm">Render_Call</div>
-    </div>
-    <div class="flow-note">
-      <span class="comment">// n8n passes only { session_id } — zero payload between nodes</span><br>
-      <span class="comment">// each stage SELECTs its own data from Postgres over private VPC</span><br>
-      <span class="comment">// status: Scraped → Enriched → Finished → HubSpot-ready</span>
+    <div class="wf-legend">
+      <div class="wf-legend-item"><b>Records Move Forward</b><span>Each node receives a cleaner payload than the one before it.</span></div>
+      <div class="wf-legend-item"><b>Context Branches Down</b><span>Memory and failure logs preserve what the next stage should not rediscover.</span></div>
+      <div class="wf-legend-item"><b>Bad Rows Exit Early</b><span>Routing prevents broken inputs from contaminating the final table.</span></div>
+      <div class="wf-legend-item"><b>CRM Logic Survives</b><span>The same pattern maps to Clay columns, HubSpot imports, and lifecycle QA.</span></div>
     </div>
   </div>
 </section>
 
-<!-- ══ STAGE 5: ABOUT ══ -->
-<section class="about" id="about">
-  <div>
-    <div class="section-label reveal" data-num="04">The Person</div>
-    <h2 class="about-h2 reveal">The Handoff Matters More Than <em>The Model.</em></h2>
-    <div class="about-body reveal">
-      <p>I learned that the hard part of AI-assisted GTM work is rarely the model by itself. <span class="muted">It is the handoff: what each step receives, what it is allowed to output, and whether the next tool can trust the payload.</span></p>
-      <p>This experiment wasn't built to be impressive. It was built to be understood. I rebuilt Clay-like enrichment logic in plain text, tested output contracts at each boundary, and learned which parts belong inside Clay columns, which parts belong in HubSpot, and which parts should never reach an outbound tool until QA passes.</p>
-      <p>I sit at the intersection of <strong>revenue operations</strong>, <strong>marketing automation</strong>, and <strong>AI-assisted workflow design</strong> — which means I care about clean CRM payloads, HubSpot handoffs, and practical Clay tables as much as clever prompts.</p>
-    </div>
-  </div>
-  <div class="reveal">
-    <div class="credentials">
-      <div class="cred">
-        <div class="cred-icon">01</div>
-        <div class="cred-text"><b>Open to RevOps, MarOps &amp; Marketing Automation roles</b><span>Remote only. Available now.</span></div>
-      </div>
-      <div class="cred">
-        <div class="cred-icon">02</div>
-        <div class="cred-text"><b>DevOps Software Engineering Program · 2026</b><span>Implementation literacy applied to RevOps and MarOps workflows.</span></div>
-      </div>
-      <div class="cred">
-        <div class="cred-icon">03</div>
-        <div class="cred-text"><b>Fenton Bookkeeping</b><span>Built the full GTM stack from zero — site, AI-SEO engine, lead pipeline. Operating revenue capability without an agency.</span></div>
-      </div>
-      <div class="cred">
-        <div class="cred-icon">04</div>
-        <div class="cred-text"><b>Reverse Engineering Clay · 45 days, $300</b><span>1,500 leads/day at peak. 18 failure modes resolved. Now translating the pattern back into Clay and HubSpot.</span></div>
-      </div>
-    </div>
-    <div class="stack-tags">
-      <span class="tag">HubSpot</span>
-      <span class="tag">Clay</span>
-      <span class="tag">n8n</span>
-      <span class="tag">Retool</span>
-      <span class="tag">Postgres</span>
-      <span class="tag">Cloud Run</span>
-      <span class="tag">Cloud SQL</span>
-      <span class="tag">GCP VPC</span>
-      <span class="tag">Node.js</span>
-      <span class="tag">Python</span>
-      <span class="tag">API Integrations</span>
-      <span class="tag">Context Engineering</span>
-      <span class="tag">Harness Engineering</span>
+<!-- ══ STAGE 5: PROMPTS ══ -->
+<section class="process" id="agents">
+  <div class="section-label reveal" data-num="04">The Prompts</div>
+  <h2 class="process-h2 reveal">Three Agents. <em>One TAM.</em></h2>
+  <p class="process-lead reveal">
+    Three Agents worked against one Total Accessible Market: Ahab found source evidence, Nemo diagnosed the row, and Neptune rendered the message layer. <span class="em">Select an Agent on the right to inspect its persona job, operating rule, handoff, prompt excerpt, and visible win.</span>
+  </p>
+
+  <div class="prompt-lab reveal">
+    <div class="prompt-panel" id="prompt-panel" role="tabpanel" aria-live="polite"></div>
+    <div class="agent-tabs" role="tablist" aria-label="Agent prompt selector">
+      <button class="agent-tab on" type="button" data-agent="ahab" role="tab" aria-selected="true"><b>Ahab</b><span>Find Stage · Raw Source Harvesting</span></button>
+      <button class="agent-tab" type="button" data-agent="nemo" role="tab" aria-selected="false"><b>Nemo</b><span>Enrich Stage · Forensic Audit</span></button>
+      <button class="agent-tab" type="button" data-agent="neptune" role="tab" aria-selected="false"><b>Neptune</b><span>Render Stage · Hook Synthesis</span></button>
     </div>
   </div>
 </section>
 
-<!-- ══ STAGE 6: CONTACT ══ -->
+<!-- ══ STAGE 6: OPERATOR ══ -->
 <section class="contact" id="contact">
   <div>
-    <div class="section-label reveal" data-num="05">Get In Touch</div>
-    <h2 class="contact-h2 reveal">The Experiment Is Still Running. <em>Let's Talk.</em></h2>
+    <div class="section-label reveal" data-num="05">The Operator</div>
+    <h2 class="contact-h2 reveal">The Experiment is Still Running. <em>Let's Talk.</em></h2>
     <p class="contact-sub reveal">If you're hiring for entry-level or junior RevOps, Marketing Ops, CRM Ops, or Marketing Automation — and you want someone who understands Clay, HubSpot-ready data, prompts, and handoffs — <span class="muted">I'd like to hear about it.</span></p>
     <a href="mailto:raymondf.gtm@gmail.com" class="contact-cta reveal">Send a message →</a>
   </div>
@@ -1259,17 +1949,12 @@ footer {
       </a>
       <a href="https://github.com/BlueSkyGTM" class="contact-link">
         <span class="cl-label">GitHub</span>
-        <span class="cl-val">github.com/BlueSkyGTM</span>
+        <span class="cl-val">github.com/BlueSkyGTM/reverse-engineering-clay</span>
         <span class="cl-arrow">↗</span>
       </a>
       <a href="https://www.linkedin.com/in/raymond-fenton-51b01b160/" class="contact-link">
         <span class="cl-label">LinkedIn</span>
         <span class="cl-val">linkedin.com/in/raymond-fenton-51b01b160</span>
-        <span class="cl-arrow">↗</span>
-      </a>
-      <a href="https://fentontaxandbookkeepingservices.com" class="contact-link">
-        <span class="cl-label">Client work</span>
-        <span class="cl-val">fentontaxandbookkeepingservices.com</span>
         <span class="cl-arrow">↗</span>
       </a>
     </div>
@@ -1292,30 +1977,168 @@ const leads = [
   {co:'MonetizeMore',title:'RevOps Systems Admin',contact:'Eric Lagunas',role:'VP of Revenue',email:'first@monetizemore.com',li:'',fr:'API Stutter',fund:'',status:'NO FUNDING',bite:'Eric, as a GTM engine scales, the focus shifts from pure execution to making revenue predictable. Relying on a RevOps admin to act as a human API for Salesforce creates data gaps that undermine pipeline visibility.',url:'monetizemore.com'},
   {co:'SOVRA',title:'Marketing Ops Leader',contact:'Tom Spengler',role:'CEO',email:'',li:'linkedin.com/in/tomspengler',fr:'API Stutter',fund:'Acquired by KKR · 2024',status:'EMAIL GAP',bite:'Tom, congrats on the KKR acquisition. Saw the search for a marketing ops leader to bridge HubSpot and Salesforce. When teams manually stitch lead data from marketing to opportunity data in sales, the executive view of the pipeline becomes unreliable.',url:'sovra.com'},
   {co:'Connor Group',title:'CRM & RevOps Analyst',contact:'Tiffany Watts',role:'Managing Director, CX',email:'tiffany.watts@connorgp.com',li:'',fr:'Manual Data Debt',fund:'',status:'NO FUNDING',bite:'Tiffany, saw the opening for a CRM & RevOps Analyst — as you scale, the manual data debt inside HubSpot starts creating a drag on pipeline visibility. The goal is automating GTM data hygiene before it ever hits the CRM.',url:'connorgp.com'},
+
+  {co:'Eleos Health',title:'GTM Operations Analyst',contact:'GTM Ops Hiring Team',role:'Revenue Operations',email:'',li:'',fr:'Manual Data Debt',fund:'$60M Series C · Jan 2025',status:'FUNDED',bite:'Saw the GTM Operations Analyst role and the Series C momentum. When revenue leaders rely on Salesforce source data and dashboards, the hidden risk is manual data debt making the numbers harder to trust. The move is tightening the CRM payload before every dashboard becomes another place to reconcile.',url:'eleos.health'},
+  {co:'Crux',title:'Marketing Ops Associate',contact:'Marketing Ops Hiring Team',role:'HubSpot / Clay Workflows',email:'',li:'',fr:'API Stutter',fund:'$50M Series B · Apr 2025',status:'FUNDED',bite:'Saw the Series B and the role calling out HubSpot workflows plus Clay and Apollo list building. That is usually the point where the GTM stack starts creating its own coordination tax. The useful work is making enrichment, routing, and CRM updates behave like one system instead of several tabs.',url:'cruxclimate.com'},
+  {co:'Forma.ai',title:'Revenue Systems / BI Operations',contact:'Revenue Ops Hiring Team',role:'Salesforce / HubSpot Reporting',email:'',li:'',fr:'Manual Data Debt',fund:'$45M Series B · May 2022',status:'FUNDED',bite:'Saw the Series B context and the reporting work across Salesforce, HubSpot, and BI dashboards. When ops teams maintain revenue visibility across that many surfaces, the problem is rarely one dashboard. It is the upstream data model that decides whether every report can be trusted.',url:'forma.ai'},
+  {co:'CharterUP',title:'Revenue Operations Associate',contact:'RevOps Hiring Team',role:'CRM Administration',email:'',li:'',fr:'Scale Friction',fund:'$60M Series A · Oct 2022',status:'FUNDED',bite:'Saw the Series A and the Revenue Operations Associate role supporting CRM administration. That is a classic scale-friction moment: the business is moving faster than the operating system underneath it. The practical win is keeping Salesforce clean enough that growth does not create reporting drag.',url:'charterup.com'},
+  {co:'Sprinto',title:'Marketing Ops / HubSpot',contact:'Marketing Ops Hiring Team',role:'HubSpot Workflow Operations',email:'',li:'',fr:'API Stutter',fund:'$20M Series B · Apr 2024',status:'FUNDED',bite:'Saw the Series B and the HubSpot workflow requirement. When compliance and GTM teams scale together, broken handoffs turn into more than inconvenience: they slow the revenue motion itself. The useful layer is clean workflow design before automation multiplies messy inputs.',url:'sprinto.com'},
+  {co:'Jump',title:'RevOps Analyst',contact:'RevOps Hiring Team',role:'Revenue Engine Scaling',email:'',li:'',fr:'Scale Friction',fund:'$24.6M Series A · Feb 2025',status:'FUNDED',bite:'Saw the Series A and the RevOps Analyst role focused on scaling the revenue engine. That usually means the team is past simple activity tracking and into pipeline reliability. The right move is turning source data, routing, and reporting into one dependable operating loop.',url:'jumpapp.com'},
+  {co:'Sierra',title:'Revenue Operations Associate',contact:'Revenue Ops Hiring Team',role:'Revenue Operations',email:'',li:'',fr:'Scale Friction',fund:'$100M round · $1B+ valuation',status:'FUNDED',bite:'Saw the Revenue Operations Associate role and the recent $100M raise. At that stage, the risk is not whether demand exists; it is whether the GTM system can stay legible while the team scales. The useful work is keeping lifecycle data and operational handoffs clean before volume hides the cracks.',url:'sierra.ai'},
 ];
 
 const rowsEl = document.getElementById('term-rows');
 const detEl = document.getElementById('term-detail');
 
+const forensicDictionary = {
+  api: {
+    name: 'API Stutter',
+    diagnosis: 'HubSpot workflows plus Clay and Apollo list building point to systems that exist, but still need a clean handoff layer.',
+    use: 'Enter their mental conversation about disconnected systems. Name the coordination tax before offering automation.',
+    payload: 'company: Crux Climate\nfunding_signal: $50M Series B · Apr 2025\nfriction_type: API Stutter\nevidence: HubSpot workflows + Clay + Apollo\nwriter_instruction: Open with funding, then pivot to disconnected GTM handoffs.',
+    hook: 'Saw the $50M Series B and the role calling out HubSpot workflows plus Clay and Apollo list building. That is usually the point where the GTM stack starts creating its own coordination tax. The useful work is making enrichment, routing, and CRM updates behave like one system instead of several tabs.',
+    email: 'Hi there,\n\nSaw the $50M Series B and the role calling out HubSpot workflows plus Clay and Apollo list building. That is usually the point where the GTM stack starts creating its own coordination tax.\n\nIf I could help keep enrichment, routing, and CRM updates behaving like one system instead of several tabs, I would start with the handoff between Clay outputs and HubSpot workflows.\n\nWorth a quick conversation?\n\nRegards,\nRaymond'
+  },
+  scale: {
+    name: 'Scale Friction',
+    diagnosis: 'A funded team is adding Marketing Ops capacity because the revenue motion is getting too large to manage through loose process.',
+    use: 'Address the fear of breaking during growth. The message should sound operational, not motivational.',
+    payload: 'company: Crux Climate\nfunding_signal: $50M Series B · Apr 2025\nfriction_type: Scale Friction\nevidence: funded team + Marketing Ops hiring\nwriter_instruction: Open with momentum, then point to the risk of growth hiding process cracks.',
+    hook: 'Saw the $50M Series B and the Marketing Ops Associate role. That is usually when the team has enough momentum that small workflow gaps start turning into reporting and routing drag. The useful work is keeping the GTM system legible before volume makes every handoff harder to inspect.',
+    email: 'Hi there,\n\nSaw the $50M Series B and the Marketing Ops Associate role. That is usually when the team has enough momentum that small workflow gaps start turning into reporting and routing drag.\n\nIf I could help keep the GTM system legible before volume makes every handoff harder to inspect, I would start with the workflow and source-data checks around HubSpot.\n\nWorth a quick conversation?\n\nRegards,\nRaymond'
+  },
+  manual: {
+    name: 'Manual Data Debt',
+    diagnosis: 'The role hints at repeated list maintenance and workflow upkeep: the kind of manual drag that accumulates when records are not standardized early.',
+    use: 'Appeal to efficiency. The villain is copy-paste cleanup and repeated record repair.',
+    payload: 'company: Crux Climate\nfunding_signal: $50M Series B · Apr 2025\nfriction_type: Manual Data Debt\nevidence: prospecting list maintenance + HubSpot workflows\nwriter_instruction: Open with funding, then name manual cleanup before reporting.',
+    hook: 'Saw the $50M Series B and the need to maintain prospecting lists across Clay, Apollo, and HubSpot. That is where manual data debt usually starts hiding inside normal marketing ops work. The useful move is standardizing the record before it turns into cleanup inside the CRM.',
+    email: 'Hi there,\n\nSaw the $50M Series B and the need to maintain prospecting lists across Clay, Apollo, and HubSpot. That is where manual data debt usually starts hiding inside normal marketing ops work.\n\nIf I could help standardize the record before it turns into cleanup inside the CRM, I would start with the table structure and the handoff fields HubSpot needs to receive cleanly.\n\nWorth a quick conversation?\n\nRegards,\nRaymond'
+  },
+  displacement: {
+    name: 'Displacement Signal',
+    diagnosis: 'Multiple tools are being asked to carry one operational job. The risk is paying for platform sprawl while the specialist workflow remains undefined.',
+    use: 'Mirror the cost of the current workaround versus the focused workflow that should replace it.',
+    payload: 'company: Crux Climate\nfunding_signal: $50M Series B · Apr 2025\nfriction_type: Displacement Signal\nevidence: Clay + Apollo + HubSpot stack\nwriter_instruction: Open with funding, then name tool sprawl as the villain.',
+    hook: 'Saw the $50M Series B and the stack spanning Clay, Apollo, and HubSpot. That can be a strong setup, but it also creates a displacement problem when every tool owns a piece of the workflow and no one owns the handoff. The useful work is making the table decide what each system should receive.',
+    email: 'Hi there,\n\nSaw the $50M Series B and the stack spanning Clay, Apollo, and HubSpot. That can be a strong setup, but it also creates a displacement problem when every tool owns a piece of the workflow and no one owns the handoff.\n\nIf I could help make the table decide what each system should receive, I would start by turning the enrichment output into fields HubSpot can actually use.\n\nWorth a quick conversation?\n\nRegards,\nRaymond'
+  },
+  funding: {
+    name: 'Funding Signal',
+    diagnosis: 'Funding is not the diagnosis. It is a context check that lets the message open with momentum when the evidence is public and recent.',
+    use: 'If present, use one short clause and pivot to friction. If null, omit it entirely.',
+    payload: 'company: Crux Climate\nfunding_signal: $50M Series B · Apr 2025\nfriction_type: health check only\nevidence: public funding record\nwriter_instruction: Use funding as the opening clause, never as the whole reason to write.',
+    hook: 'Saw the $50M Series B. The funding is not the point by itself; it is the clue that the GTM system now has more pressure running through it. The message still has to earn attention by naming the operational friction underneath the momentum.',
+    email: 'Hi there,\n\nSaw the $50M Series B. The funding is not the point by itself; it is the clue that the GTM system now has more pressure running through it.\n\nIf I could help turn that momentum into cleaner Clay-to-HubSpot handoffs, I would start with the fields that decide whether enrichment becomes action or cleanup.\n\nWorth a quick conversation?\n\nRegards,\nRaymond'
+  }
+};
+
+function renderForensicPlay(key = 'api') {
+  const item = forensicDictionary[key];
+  const diag = document.getElementById('forensic-diagnostic');
+  const payload = document.getElementById('forensic-payload');
+  const hook = document.getElementById('forensic-hook');
+  const email = document.getElementById('forensic-email');
+  if (!item || !diag || !payload || !hook || !email) return;
+  diag.innerHTML = '<div class="diag-name">' + item.name + '</div>' +
+    '<div class="diag-copy">' + item.diagnosis + '</div>' +
+    '<div class="diag-use"><b>Receiving Bot Rule:</b> ' + item.use + '</div>';
+  payload.textContent = item.payload;
+  hook.textContent = item.hook;
+  email.textContent = item.email;
+}
+
+function escapeHtml(str) {
+  return String(str).replace(/[&<>"]/g, ch => {
+    if (ch === '&') return '&amp;';
+    if (ch === '<') return '&lt;';
+    if (ch === '>') return '&gt;';
+    return '&quot;';
+  });
+}
+
+function firstName(l) {
+  if (/hiring team/i.test(l.contact)) return 'there';
+  return (l.contact || '').split(' ')[0] || 'there';
+}
+
+function cleanBite(text) {
+  return String(text || '').replace(/\s+/g, ' ').trim();
+}
+
+function emailPayload(l) {
+  const systems = {
+    'API Stutter': {
+      result: 'keep the GTM stack from turning into manual API babysitting',
+      system: 'a Clay-to-HubSpot handoff that keeps enrichment, routing, and CRM updates aligned'
+    },
+    'Manual Data Debt': {
+      result: 'remove manual GTM cleanup before it reaches reporting',
+      system: 'a CRM-ready enrichment table that standardizes records before HubSpot or Salesforce touches them'
+    },
+    'Scale Friction': {
+      result: 'keep revenue data legible while the team scales',
+      system: 'a lifecycle QA workflow that catches handoff drift before volume hides it'
+    },
+    'Displacement Signal': {
+      result: 'replace scattered tool work with one cleaner specialist workflow',
+      system: 'a focused enrichment and CRM handoff layer built around the job the platform is being asked to do'
+    }
+  };
+  const frame = systems[l.fr] || systems['API Stutter'];
+  const funding = l.fund ? l.fund.split('·')[0].trim() : 'the hiring signal';
+  const bite = cleanBite(l.bite);
+  const email = 'Hi ' + firstName(l) + ',\n\n' +
+    bite + '\n\n' +
+    'If I could ' + frame.result + ' using ' + frame.system + ',\n\n' +
+    'That is where I would start: ' + funding + ', the ' + l.title + ' role, and the friction signal already visible in the row. Would you be open to a quick conversation?\n\n' +
+    '\n\nRegards,\nRaymond';
+  return {email};
+}
+
 function showDetail(l) {
+  const email = emailPayload(l);
+  const emailRow = l.email ? `<div class="raw-row"><div class="raw-k">Email</div><div class="raw-v"><a href="mailto:${l.email}">${l.email}</a></div></div>` : '';
+  const linkedInRow = l.li ? `<div class="raw-row"><div class="raw-k">LinkedIn</div><div class="raw-v"><a href="https://${l.li}">${l.li}</a></div></div>` : '';
+  const fundingRow = l.fund ? `<div class="raw-row"><div class="raw-k">Funding Signal</div><div class="raw-v"><span class="d-fund">${l.fund}</span></div></div>` : '';
   detEl.innerHTML = `
-    <div class="dl">Company</div>
-    <div class="dv"><strong>${l.co}</strong> <span class="small">· ${l.url}</span></div>
-    <div class="dl">Role · Contact</div>
-    <div class="dv">${l.contact} <span class="small">— ${l.role}</span></div>
-    ${l.email?`<div class="dl">Email</div><div class="dv"><a href="mailto:${l.email}">${l.email}</a></div>`:''}
-    ${l.li?`<div class="dl">LinkedIn</div><div class="dv"><a href="https://${l.li}">${l.li}</a></div>`:''}
-    <div class="dl">Source role</div>
-    <div class="dv">${l.title}</div>
-    <div class="dl">Friction type</div>
-    <div class="dv"><span class="tr-badge">${l.fr}</span></div>
-    ${l.fund?`<div class="dl">Funding signal</div><div class="d-fund">${l.fund}</div>`:''}
-    <div class="dl">Outreach bite</div>
+    <div class="raw-card">
+      <div class="raw-row">
+        <div class="raw-k">Company</div>
+        <div class="raw-v"><strong>${l.co}</strong> <span class="small">· ${l.url}</span></div>
+      </div>
+      <div class="raw-row">
+        <div class="raw-k">Role · Contact</div>
+        <div class="raw-v">${l.contact} <span class="small">— ${l.role}</span></div>
+      </div>
+      ${emailRow}
+      ${linkedInRow}
+      <div class="raw-row">
+        <div class="raw-k">Source Role</div>
+        <div class="raw-v">${l.title}</div>
+      </div>
+      <div class="raw-row">
+        <div class="raw-k">Friction Type</div>
+        <div class="raw-v"><span class="tr-badge">${l.fr}</span></div>
+      </div>
+      ${fundingRow}
+    </div>
+    <div class="dl">Hook</div>
     <div class="d-bite">"${l.bite}"</div>
+    <div class="dl" style="margin-top:18px">Email</div>
+    <div class="email-block">${escapeHtml(email.email)}</div>
   `;
 }
 
-leads.forEach((l,i) => {
+renderForensicPlay('api');
+document.querySelectorAll('.dictionary-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.dictionary-btn').forEach(b => b.classList.remove('on'));
+    btn.classList.add('on');
+    renderForensicPlay(btn.dataset.friction);
+  });
+});
+leads.filter(l => l.fund).forEach((l,i) => {
   const row = document.createElement('div');
   row.className = 'term-row' + (i===0?' on':'');
   row.tabIndex = 0;
@@ -1324,13 +2147,11 @@ leads.forEach((l,i) => {
   row.setAttribute('aria-pressed', i===0 ? 'true' : 'false');
   row.innerHTML = `
     <div class="tr-co">${l.co}</div>
-    <div class="tr-name"><b>${l.contact}</b></div>
-    <div class="tr-cell good">${l.role}</div>
-    <div class="tr-cell${l.email?' good':' empty'}">${l.email || 'not found'}</div>
-    <div class="tr-cell${l.li?' good':' empty'}">${l.li ? 'profile found' : 'not found'}</div>
-    <div class="tr-fund${l.fund?'':' empty'}">${l.fund ? l.fund.split('·')[0].trim() : '—'}</div>
+    <div class="tr-name"><b>${l.contact}</b><span>${l.role}</span></div>
     <div><span class="tr-badge">${l.fr}</span></div>
-    <div class="tr-status${l.status === 'FINISHED' ? '' : ' warn'}">${l.status}</div>
+    <div class="tr-fund">${l.fund.split('·')[0].trim()}</div>
+    <div class="tr-bite-cell">${l.bite}</div>
+    <div class="tr-email-cell">${escapeHtml(emailPayload(l).email)}</div>
   `;
   row.onclick = () => {
     document.querySelectorAll('.term-row').forEach(r=>{
@@ -1351,6 +2172,187 @@ leads.forEach((l,i) => {
 });
 
 showDetail(leads[0]);
+
+
+// CLICKABLE WORKFLOW MAP
+const workflowSteps = {
+  ignition: {
+    title: 'Engine Ignition', type: 'Trigger',
+    summary: 'Starts the pipeline with an active campaign instead of a blank prompt.',
+    carries: 'Campaign ID, active status, source boundaries.',
+    why: 'The run begins with operating context, so the downstream Agents do not invent the market or the target.',
+    payload: 'Active Campaign -> Campaign Config -> Source Rules'
+  },
+  config: {
+    title: 'Campaign Config', type: 'Input',
+    summary: 'Loads the rules that define what counts as useful evidence.',
+    carries: 'Target market, exclusion rules, message angle, source rules.',
+    why: 'This is where TAM becomes operational. The Agents search inside the market instead of wandering the web.',
+    payload: 'TAM + Exclusions + Message Frame'
+  },
+  ahab: {
+    title: 'Ahab', type: 'Agent',
+    summary: 'Finds direct source signals while avoiding loud job-board surfaces.',
+    carries: 'Company clues, role clues, source URLs, short evidence fragments.',
+    why: 'Ahab made the first record cleaner by treating source quality as the first QA gate.',
+    payload: 'Direct Source Evidence -> Raw Lead Fragment'
+  },
+  parser: {
+    title: 'Record Parser', type: 'Parser',
+    summary: 'Turns messy model output into fields the next step can trust.',
+    carries: 'Normalized rows, split outputs, structured handoff fields.',
+    why: 'This is the mechanical bridge between AI output and table logic. Without it, the next Agent inherits noise.',
+    payload: 'Messy Output -> Structured Row'
+  },
+  router: {
+    title: 'Exclusion Router', type: 'Gate',
+    summary: 'Removes duplicates, dead links, excluded accounts, and bad fits before enrichment.',
+    carries: 'Pass/fail route, rejection reason, clean candidate list.',
+    why: 'Bad rows are expensive because they pollute every downstream prompt. Routing keeps the payload clean.',
+    payload: 'Candidate Row -> Keep or Shipwreck'
+  },
+  nemo: {
+    title: 'Nemo', type: 'Agent',
+    summary: 'Diagnoses the row using source evidence and the Forensic Dictionary.',
+    carries: 'Friction type, proof URL, contact context, funding context when available.',
+    why: 'Nemo turns facts into a GTM diagnosis, which is the difference between enrichment and a pile of trivia.',
+    payload: 'Evidence -> Friction Diagnosis'
+  },
+  neptune: {
+    title: 'Neptune', type: 'Agent',
+    summary: 'Turns the diagnosis into a hook that can become an email.',
+    carries: 'Hook, tone, specific outcome, final message rules.',
+    why: 'Neptune keeps the message grounded in the row so the final copy sounds observed instead of generated.',
+    payload: 'Diagnosis -> Hook -> Email Frame'
+  },
+  payload: {
+    title: 'Payload Table', type: 'Output',
+    summary: 'The final review object: a GTM record with context still attached.',
+    carries: 'Company, contact, source role, friction type, funding signal, hook, email.',
+    why: 'This is the object an operator can review, enrich in Clay, or shape for HubSpot-ready handoff.',
+    payload: 'CRM-Ready GTM Payload'
+  },
+  ahabMemory: {
+    title: 'Ahab Memory', type: 'Memory',
+    summary: 'Keeps source facts attached long enough for the next stage to use them.',
+    carries: 'Search branches, job-page clues, direct URLs.',
+    why: 'The record does not lose where it came from. That is what makes the next judgment auditable.',
+    payload: 'Source Facts + URL Evidence'
+  },
+  shipwreck: {
+    title: 'Shipwreck Log', type: 'Failure Route',
+    summary: 'Stores bad rows outside the final payload instead of letting them disappear silently.',
+    carries: 'Rejected records, failure reason, duplicate or dead-link notes.',
+    why: 'Failure data is still useful. It explains why the payload stayed clean.',
+    payload: 'Rejected Row + Reason'
+  },
+  nemoMemory: {
+    title: 'Nemo Memory', type: 'Memory',
+    summary: 'Stores the diagnosis layer that Neptune should inherit.',
+    carries: 'Friction type, proof, funding context, contact context.',
+    why: 'This is the handoff that prevents the writer from starting over.',
+    payload: 'Friction Profile + Proof'
+  },
+  neptuneMemory: {
+    title: 'Neptune Memory', type: 'Memory',
+    summary: 'Preserves final message rules and the hook logic.',
+    carries: 'Hook, tone, one-reader rule, first-person framing.',
+    why: 'The final copy stays tied to the diagnosis instead of drifting into generic outreach.',
+    payload: 'Hook + Message Rules'
+  }
+};
+const workflowDetail = document.getElementById('workflow-detail');
+function renderWorkflowStep(key) {
+  const item = workflowSteps[key];
+  if (!workflowDetail || !item) return;
+  workflowDetail.innerHTML = '<div class="wf-detail-title">' + item.title + '</div>' +
+    '<div class="wf-detail-sub">' + item.type + '</div>' +
+    '<div class="raw-card">' +
+    '<div class="raw-row"><div class="raw-k">What it Does</div><div class="raw-v">' + item.summary + '</div></div>' +
+    '<div class="raw-row"><div class="raw-k">What it Carries</div><div class="raw-v">' + item.carries + '</div></div>' +
+    '<div class="raw-row"><div class="raw-k">Why it Matters</div><div class="raw-v">' + item.why + '</div></div>' +
+    '</div>' +
+    '<div class="dl">Payload Movement</div><div class="d-bite">' + item.payload + '</div>';
+}
+document.querySelectorAll('[data-flow]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('[data-flow]').forEach(b => b.classList.remove('on'));
+    btn.classList.add('on');
+    renderWorkflowStep(btn.dataset.flow);
+  });
+});
+renderWorkflowStep('ignition');
+
+
+// AGENT PROMPT LAB
+const agentPrompts = {
+  ahab: {
+    name: 'Ahab',
+    subtitle: 'The Hunter · Search Dorking and Source Discipline',
+    meta: 'Gemini Flash · temp 0.0 · Google grounding',
+    mission: 'Act like a source hunter. Find direct evidence first, then hand off fragments without trying to diagnose them.',
+    constraint: 'Use dorking, direct portals, ATS pages, and company surfaces before trusting aggregator noise.',
+    behavior: 'The persona blocked generic search behavior. Ahab hunted for source quality and left interpretation for Nemo.',
+    handoff: 'Ahab hands Nemo raw source fragments: company, role clue, URL, and short evidence.',
+    proof: 'The pipeline reached cleaner source surfaces before enrichment, which gave the rest of the system better raw material.',
+    guardrails: ['Run 5+ varied search branches using site-specific operators.', 'Prioritize direct portals, ATS pages, company pages, and role evidence over LinkedIn/Indeed-style noise.', 'Apply excluded-company and campaign filters before returning the catch.', 'Extract short raw signals only so the next stage can reason from clean fragments.'],
+    excerpt: '[Task]: RAW DATA HARVESTING\n[Persona]: Ahab, the Hunter\n[Reasoning_Protocol]: Execute 5+ varied search queries. Every search query MUST use site-specific operators and direct portals where applicable.\n[Core_Directive]: Do not burn tokens on analysis. Give Nemo the maximum number of raw leads possible.',
+    value: 'Ahab\'s win was source discipline: skip the loud surface web and reach the core source faster.'
+  },
+  nemo: {
+    name: 'Nemo',
+    subtitle: 'The Analyst · Forensic Signal Extraction',
+    meta: 'Gemini Pro · temp 0.0 · proof required',
+    mission: 'Act like a forensic analyst. Decide whether a row has enough proof, timing, and operational pressure to become a GTM payload.',
+    constraint: 'Resolve the domain, require proof, and classify friction before the row can move toward outreach.',
+    behavior: 'The persona forced evidence into a diagnostic shape: source, friction, proof, and next-stage context.',
+    handoff: 'Nemo hands Neptune a friction profile, proof URLs, and contact context.',
+    proof: 'Rows became safe enough for Clay-style enrichment because Neptune inherited evidence instead of guesses.',
+    guardrails: ['Resolve the direct company domain instead of trusting a listing URL.', 'Use proof URLs for every operational claim.', 'Classify the problem with the forensic dictionary: API Stutter, Scale Friction, Manual Data Debt, Displacement Signal.', 'Shipwreck stale, thin, broken, or unprovable rows before outreach.'],
+    excerpt: '[Task]: SINGLE-LEAD DIAGNOSTIC ENRICHMENT\n[Clay_Readiness_Protocol]: Think through each field as if Clay will use it to run further enrichment downstream.\n[Forensic_Dictionary]: API Stutter, Scale Friction, Manual Data Debt, Displacement Signal.\n[Core_Directive]: Every technical or operational claim MUST have a corresponding proof URL.',
+    value: 'This is where raw lead data became judgment. Nemo made the row safe enough for Clay-style enrichment and CRM-ready routing.'
+  },
+  neptune: {
+    name: 'Neptune',
+    subtitle: 'The Authority Engine · Pain-Aware Outreach',
+    meta: 'Gemini Pro · temp 0.7 · constrained variation',
+    mission: 'Act like a pain-aware GTM writer. Turn the diagnosis into a hook that enters the prospect\'s existing conversation.',
+    constraint: 'Reflect first, name the operational villain, offer one specific outcome, and stay in first person.',
+    behavior: 'The persona prevented generic outreach. Neptune wrote from the diagnosed pressure instead of from a blank sales template.',
+    handoff: 'Neptune receives Nemo\'s diagnosis and returns one hook for the final email.',
+    proof: 'The hook carries diagnosed pain into the email while staying tied to the original row.',
+    guardrails: ['Reflect the prospect\'s reality before making a claim.', 'Use funding only when evidence exists.', 'Name the operational villain behind the role: broken syncs, manual routing, CRM drag, tool sprawl.', 'Offer one specific outcome in first person, never agency voice.'],
+    excerpt: '[Mission]: Synthesize a structured Friction Profile into a Robert Collier-style hook.\n[Prime_Directive]: You are not selling. You are confirming what the prospect already knows.\n[Schwartz]: Reflect before you claim. Name the villain. Offer the specific outcome.\n[HOOK_CONSTRAINT]: Maximum 3-4 sentences.',
+    value: 'The subtle win was tone control. Neptune treated job listings as symptoms of internal pain, then produced a hook that carries that pain into the final email without hallucinating proof.'
+  }
+};
+
+const promptPanel = document.getElementById('prompt-panel');
+function renderPromptAgent(key) {
+  const a = agentPrompts[key];
+  promptPanel.innerHTML = '<div class="prompt-top"><div><div class="prompt-title">' + a.name + '</div><div class="prompt-subtitle">' + a.subtitle + '</div></div><div class="prompt-meta">' + a.meta + '</div></div>' +
+    '<div class="prompt-grid">' +
+    '<div class="prompt-box"><b>Persona Job</b><p>' + a.mission + '</p></div>' +
+    '<div class="prompt-box"><b>Operating Rule</b><p>' + a.constraint + '</p></div>' +
+    '<div class="prompt-box"><b>Behavior it Forced</b><p>' + a.proof + '</p></div>' +
+    '<div class="prompt-box full"><b>Handoff Contract</b><p>' + a.handoff + '</p></div>' +
+    '<div class="prompt-box full"><b>Prompt Excerpt</b><div class="prompt-code">' + a.excerpt + '</div></div>' +
+    '</div>';
+}
+
+document.querySelectorAll('.agent-tab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.agent-tab').forEach(b => {
+      b.classList.remove('on');
+      b.setAttribute('aria-selected', 'false');
+    });
+    btn.classList.add('on');
+    btn.setAttribute('aria-selected', 'true');
+    renderPromptAgent(btn.dataset.agent);
+  });
+});
+
+renderPromptAgent('ahab');
 
 // SCROLL REVEAL
 const obs = new IntersectionObserver(entries => {
