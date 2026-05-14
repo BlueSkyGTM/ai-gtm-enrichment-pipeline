@@ -1512,51 +1512,114 @@ footer {
   footer { flex-direction: column; gap: 16px; padding: 28px 24px; text-align: center; }
 }
 
-/* Interaction Upgrade: Plumbing + Prompts */
+/* =========================================================
+   Interaction Upgrade: Plumbing + Prompts
+========================================================= */
+
+.flow-wrap {
+  text-align: center;
+}
+
 .flow-stage {
   display: grid;
   grid-template-columns: minmax(0, 1.28fr) minmax(300px, 0.72fr);
-  gap: 1px;
+
   border: 1px solid var(--border2);
-  background: var(--border2);
+  background: var(--surface);
+
+  overflow: hidden;
+
   box-shadow: 0 40px 120px rgba(0,0,0,0.28);
+
+  text-align: left;
 }
+
+/* =========================================================
+   LEFT PANEL
+========================================================= */
+
 .workflow-map {
-  border: 0;
   min-height: 360px;
+
+  background: var(--surface2);
+
+  /* cleaner divider */
+  border-right: 1px solid rgba(185,227,106,0.14);
+
+  /* optional subtle seam glow */
+  box-shadow: inset -1px 0 0 rgba(185,227,106,0.06);
 }
+
 .workflow-map.has-panel {
   padding: 34px 22px 30px;
 }
+
+.workflow-map .wf-grid {
+  margin-left: auto;
+  margin-right: auto;
+}
+
 .wf-grid {
   grid-template-rows: auto 34px auto;
 }
+
+/* =========================================================
+   WORKFLOW NODES
+========================================================= */
+
 .wf-node {
   font-family: 'DM Sans', sans-serif;
   text-align: left;
   cursor: pointer;
-  transition: border-color .2s, background .2s, transform .2s, box-shadow .2s;
+
+  transition:
+    border-color .2s,
+    background .2s,
+    transform .2s,
+    box-shadow .2s;
 }
+
 .wf-node:hover,
 .wf-node.on {
   border-color: var(--action);
   background: rgba(118,161,255,0.12);
   transform: translateY(-2px);
 }
+
 .wf-node.on {
-  box-shadow: inset 0 3px 0 var(--action), 0 18px 44px rgba(0,0,0,0.34);
+  box-shadow:
+    inset 0 3px 0 var(--action),
+    0 18px 44px rgba(0,0,0,0.34);
 }
-.wf-node.agent.on { border-color: var(--accent); background: rgba(185,227,106,0.08); }
+
+.wf-node.agent.on {
+  border-color: var(--accent);
+  background: rgba(185,227,106,0.08);
+}
+
 .wf-node:focus-visible {
   outline: 2px solid var(--action);
   outline-offset: 3px;
 }
+
+/* =========================================================
+   CHIPS
+========================================================= */
+
 .wf-chip {
   font-family: 'DM Sans', sans-serif;
   cursor: pointer;
   text-align: left;
-  transition: border-color .2s, background .2s, color .2s, transform .2s;
+
+  color: var(--text);
+
+  transition:
+    border-color .2s,
+    background .2s,
+    color .2s,
+    transform .2s;
 }
+
 .wf-chip:hover,
 .wf-chip.on {
   border-color: var(--action);
@@ -1564,102 +1627,159 @@ footer {
   color: var(--text);
   transform: translateY(-1px);
 }
-.wf-chip.on strong { color: var(--accent); }
+
+.wf-chip strong {
+  color: var(--accent);
+}
+
+.wf-chip.on strong {
+  color: var(--accent);
+}
+
+/* =========================================================
+   RIGHT DETAIL PANEL
+========================================================= */
+
 .wf-detail {
   background: var(--surface2);
+
   padding: 24px;
-  border-left: 1px solid var(--border2);
+
   min-height: 360px;
+
   overflow: visible;
 }
-.wf-detail .raw-card { margin-bottom: 18px; }
-.wf-detail .raw-v strong { color: var(--accent); }
-.wf-detail .d-bite { font-size: 14px; }
-.wf-detail-title {
-  font-size: clamp(28px, 3vw, 42px);
-  color: var(--text);
-  line-height: 1;
-  font-weight: 500;
-  margin-bottom: 10px;
-}
-.wf-detail-sub {
-  color: var(--accent);
-  font-size: 13px;
-  font-weight: 500;
+
+.wf-detail .raw-card {
   margin-bottom: 18px;
 }
+
+.wf-detail .raw-v strong {
+  color: var(--accent);
+}
+
+.wf-detail .d-bite {
+  font-size: 14px;
+}
+
+.wf-detail-title {
+  font-size: clamp(28px, 3vw, 42px);
+  line-height: 1;
+  font-weight: 500;
+
+  color: var(--text);
+
+  margin-bottom: 10px;
+}
+
+.wf-detail-sub {
+  color: var(--accent);
+
+  font-size: 13px;
+  font-weight: 500;
+
+  margin-bottom: 18px;
+}
+
+/* =========================================================
+   LEGEND
+========================================================= */
+
 .wf-legend {
   grid-column: 1 / -1;
 }
-.prompt-lab {
-  grid-template-columns: minmax(0, 1fr) 300px;
-}
-.agent-tabs {
-  background: var(--surface2);
-}
-.agent-tab {
-  border-color: var(--border2);
-  border-left-color: rgba(185,227,106,0.34);
-  background: rgba(255,255,255,0.026);
-}
-.agent-tab:hover,
-.agent-tab.on {
-  border-color: var(--action);
-  border-left-color: var(--action);
-  background: var(--action-soft);
-}
-.prompt-panel {
-  background: var(--surface2);
-}
-.prompt-grid {
-  grid-template-columns: minmax(220px, 0.86fr) minmax(240px, 1fr) minmax(240px, 1fr);
-}
-.prompt-box {
-  background: rgba(255,255,255,0.026);
-}
-.prompt-box.action {
-  border-color: var(--border);
-  background: rgba(255,255,255,0.026);
-}
-.prompt-box.persona {
-  border-color: rgba(185,227,106,0.32);
-  background: rgba(185,227,106,0.045);
-}
-.prompt-box.persona b,
-.prompt-box.highlight b { color: var(--accent); }
-@media (max-width: 980px) {
-  .flow-stage { grid-template-columns: 1fr; }
-  .wf-detail { border-left: 0; border-top: 1px solid var(--border2); min-height: 0; }
-}
 
-.flow-wrap {
-  text-align: center;
-}
-.flow-stage {
-  text-align: left;
-}
-.workflow-map .wf-grid {
-  margin-left: auto;
-  margin-right: auto;
-}
-/* Final Readability Overrides */
 .wf-sub,
-.wf-chip,
 .wf-legend-item span,
 .agent-tab span {
   color: var(--text);
 }
-.wf-chip strong {
-  color: var(--accent);
+
+/* =========================================================
+   PROMPT LAB
+========================================================= */
+
+.prompt-lab {
+  grid-template-columns: minmax(0, 1fr) 300px;
 }
+
+.agent-tabs {
+  background: var(--surface2);
+}
+
+.agent-tab {
+  border-color: var(--border2);
+  border-left-color: rgba(185,227,106,0.34);
+
+  background: rgba(255,255,255,0.026);
+}
+
+.agent-tab:hover,
+.agent-tab.on {
+  border-color: var(--action);
+  border-left-color: var(--action);
+
+  background: var(--action-soft);
+}
+
+.prompt-panel {
+  background: var(--surface2);
+}
+
+.prompt-grid {
+  grid-template-columns:
+    minmax(220px, 0.86fr)
+    minmax(240px, 1fr)
+    minmax(240px, 1fr);
+}
+
+.prompt-box {
+  background: rgba(255,255,255,0.026);
+}
+
 .prompt-box.action {
   border-color: var(--border);
   background: rgba(255,255,255,0.026);
 }
+
+.prompt-box.persona {
+  border-color: rgba(185,227,106,0.32);
+  background: rgba(185,227,106,0.045);
+}
+
+.prompt-box.persona b,
+.prompt-box.highlight b {
+  color: var(--accent);
+}
+
 .prompt-code {
   background: rgba(0,0,0,0.18);
+
   border: 1px solid var(--border);
+
   padding: 16px;
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 980px) {
+
+  .flow-stage {
+    grid-template-columns: 1fr;
+  }
+
+  .workflow-map {
+    border-right: 0;
+    border-bottom: 1px solid var(--border2);
+
+    box-shadow: none;
+  }
+
+  .wf-detail {
+    min-height: 0;
+  }
 }
 
 /* Prompt Section Horizontal Tabs */
@@ -2567,6 +2687,614 @@ footer {
   color: #8FB7FF !important;
   font-size: 30px !important;
 }
+
+/* Payload Scroll Restoration */
+.term-body {
+  min-width: 0 !important;
+  overflow: hidden !important;
+}
+.term-list {
+  min-width: 0 !important;
+  overflow-x: auto !important;
+  overflow-y: auto !important;
+  height: 100% !important;
+  scrollbar-gutter: stable both-edges;
+}
+.term-detail {
+  min-width: 0 !important;
+  height: 100% !important;
+  max-height: 720px !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  scrollbar-gutter: stable;
+}
+.term-head,
+.term-row {
+  min-width: 1340px !important;
+}
+.term-list::-webkit-scrollbar {
+  width: 8px !important;
+  height: 9px !important;
+}
+.term-detail::-webkit-scrollbar {
+  width: 8px !important;
+}
+.term-list::-webkit-scrollbar-track,
+.term-detail::-webkit-scrollbar-track {
+  background: rgba(255,255,255,0.035);
+}
+.term-list::-webkit-scrollbar-thumb,
+.term-detail::-webkit-scrollbar-thumb {
+  background: rgba(185,227,106,0.5) !important;
+  border-radius: 999px;
+}
+
+/* Payload Pane Lock */
+.term-body {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1.34fr) minmax(360px, 0.66fr) !important;
+  align-items: stretch !important;
+  height: 720px !important;
+  overflow: hidden !important;
+}
+.term-list {
+  position: relative !important;
+  isolation: isolate !important;
+  contain: paint !important;
+  clip-path: inset(0) !important;
+  min-height: 0 !important;
+  border-right: 1px solid var(--border) !important;
+  background: var(--surface) !important;
+}
+.term-head {
+  position: sticky !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: max-content !important;
+  background: #101010 !important;
+  z-index: 4 !important;
+}
+#term-rows {
+  width: max-content !important;
+  min-width: 100% !important;
+}
+.term-detail {
+  position: relative !important;
+  z-index: 5 !important;
+  grid-column: 2 !important;
+  grid-row: 1 !important;
+  border-left: 1px solid var(--border) !important;
+  background: var(--surface2) !important;
+  min-height: 0 !important;
+}
+@media (max-width: 900px) {
+  .term-body {
+    grid-template-columns: 1fr !important;
+    height: auto !important;
+  }
+  .term-detail {
+    grid-column: 1 !important;
+    grid-row: auto !important;
+    height: 460px !important;
+    max-height: 460px !important;
+    border-left: 0 !important;
+    border-top: 1px solid var(--border) !important;
+  }
+}
+
+/* Payload Detail Profile Label */
+.term-detail .profile-label {
+  margin-top: 0 !important;
+  margin-bottom: 10px !important;
+}
+.term-detail > .raw-card:first-of-type {
+  margin-top: 0 !important;
+}
+
+/* Payload Detail Rhythm */
+.term-detail .detail-section-label {
+  margin: 22px 0 10px !important;
+}
+.term-detail .detail-section-label:first-child,
+.term-detail .profile-label {
+  margin-top: 0 !important;
+}
+.term-detail .raw-card,
+.term-detail .d-bite,
+.term-detail .email-block {
+  margin-bottom: 0 !important;
+}
+
+/* Prompt Border Balance */
+.agent-card::before,
+.agent-prompt-grid .prompt-excerpt-column::before {
+  display: none !important;
+}
+.agent-card,
+.agent-prompt-grid .prompt-excerpt-column {
+  border-width: 3px !important;
+}
+.agent-card.ahab-card,
+.prompt-excerpt-column.ahab-prompt {
+  border-color: rgba(185,227,106,0.48) !important;
+}
+.agent-card.nemo-card,
+.prompt-excerpt-column.nemo-prompt {
+  border-color: rgba(118,161,255,0.52) !important;
+}
+.agent-card.neptune-card,
+.prompt-excerpt-column.neptune-prompt {
+  border-color: rgba(215,183,255,0.52) !important;
+}
+/* Forensic Dictionary Column Frame */
+.forensic-lab {
+  border-color: rgba(185,227,106,0.46) !important;
+}
+.forensic-panel {
+  border: 2px solid rgba(185,227,106,0.30) !important;
+  border-right-width: 2px !important;
+}
+.forensic-panel::before {
+  background: var(--accent) !important;
+}
+.forensic-panel:last-child {
+  border-right: 2px solid rgba(185,227,106,0.30) !important;
+}
+/* Artifact Frame System */
+.terminal,
+.flow-wrap,
+.agent-showcase {
+  border-color: rgba(185,227,106,0.42) !important;
+  box-shadow: 0 40px 120px rgba(0,0,0,0.30), 0 0 0 1px rgba(185,227,106,0.08) !important;
+}
+.flow-wrap {
+  border-width: 1px !important;
+}
+.agent-showcase {
+  border-width: 1px !important;
+}
+.term-head span {
+  text-transform: none !important;
+  color: var(--text) !important;
+  font-weight: 700 !important;
+}
+/* Scrollbar + Border Polish */
+:root {
+  --scroll-blue: #365FA8;
+  --scroll-track: #0D1118;
+}
+.term-list,
+.term-detail,
+.workflow-map {
+  scrollbar-color: var(--scroll-blue) var(--scroll-track);
+  scrollbar-width: thin;
+}
+.term-list::-webkit-scrollbar,
+.term-detail::-webkit-scrollbar,
+.workflow-map::-webkit-scrollbar {
+  width: 7px !important;
+  height: 7px !important;
+}
+.term-list::-webkit-scrollbar-track,
+.term-detail::-webkit-scrollbar-track,
+.workflow-map::-webkit-scrollbar-track {
+  background: var(--scroll-track) !important;
+}
+.term-list::-webkit-scrollbar-thumb,
+.term-detail::-webkit-scrollbar-thumb,
+.workflow-map::-webkit-scrollbar-thumb {
+  background: var(--scroll-blue) !important;
+  border-radius: 999px;
+}
+.terminal {
+  border-width: 3px !important;
+}
+.term-bar {
+  border-bottom-width: 2px !important;
+}
+.term-list {
+  border-right: 3px solid rgba(185,227,106,0.34) !important;
+}
+.term-head {
+  border-bottom: 2px solid rgba(185,227,106,0.24) !important;
+}
+.term-row {
+  border-bottom-width: 2px !important;
+}
+.agent-showcase {
+  border-width: 3px !important;
+}
+.agent-prompt-grid .prompt-excerpt {
+  border: 0 !important;
+  background: repeating-linear-gradient(180deg, rgba(255,255,255,0.018) 0, rgba(255,255,255,0.018) 1px, transparent 1px, transparent 26px), rgba(0,0,0,0.12) !important;
+}
+.agent-prompt-grid .prompt-kicker {
+  border-bottom: 0 !important;
+}
+/* Prompt Outer Frame Correction */
+.agent-showcase {
+  border-width: 1px !important;
+}
+/* Payload Column Separators */
+.term-head span,
+.term-row > * {
+  border-left: 1px solid rgba(185,227,106,0.16);
+  padding-left: 12px;
+}
+.term-head span:first-child,
+.term-row > *:first-child {
+  border-left: 0;
+  padding-left: 0;
+}
+.term-head span {
+  box-shadow: inset 0 -1px 0 rgba(185,227,106,0.20);
+}
+/* Forensic Dictionary Button Wrap */
+.dictionary-btn {
+  border: 2px solid rgba(185,227,106,0.32) !important;
+  border-left-width: 2px !important;
+}
+.dictionary-btn:hover,
+.dictionary-btn.on {
+  border-color: var(--accent) !important;
+  border-left-color: var(--accent) !important;
+}
+/* Payload Column Separator Simplification */
+.term-head span,
+.term-row > * {
+  border-left: 0 !important;
+  padding-left: 0 !important;
+}
+.term-head span {
+  box-shadow: none !important;
+}
+.term-row {
+  box-shadow: inset 0 -1px 0 rgba(185,227,106,0.12);
+}
+.term-row.on {
+  box-shadow: inset 3px 0 0 var(--action), inset 0 -1px 0 rgba(185,227,106,0.14) !important;
+}
+/* Plumbing Frame Match */
+.flow-wrap {
+  border: 3px solid rgba(185,227,106,0.42) !important;
+}
+.flow-stage {
+  border-top: 1px solid rgba(185,227,106,0.18) !important;
+}
+.workflow-map {
+  border: 2px solid rgba(185,227,106,0.24) !important;
+}
+.wf-detail {
+  border-left: 2px solid rgba(185,227,106,0.24) !important;
+}
+/* Operator + Plumbing Final Polish */
+.contact {
+  align-items: stretch !important;
+  gap: clamp(40px, 6vw, 84px) !important;
+}
+.contact-copy {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+}
+.contact-h2 {
+  max-width: 820px !important;
+  font-size: clamp(44px, 4.7vw, 76px) !important;
+  line-height: 0.98 !important;
+  letter-spacing: 0 !important;
+}
+.contact-h2 em {
+  display: inline-block !important;
+  color: var(--accent) !important;
+}
+.contact-sub {
+  color: var(--text) !important;
+  max-width: 620px !important;
+}
+.contact-links {
+  gap: 14px !important;
+  padding: 18px !important;
+  background: linear-gradient(180deg, rgba(255,255,255,0.035), rgba(255,255,255,0.012)) !important;
+  border: 1px solid rgba(185,227,106,0.42) !important;
+  box-shadow: 0 40px 120px rgba(0,0,0,0.30), 0 0 0 1px rgba(185,227,106,0.08) !important;
+}
+.contact-link {
+  grid-template-columns: 96px 1fr 34px !important;
+  min-height: 76px !important;
+  padding: 18px 20px !important;
+  border: 2px solid rgba(185,227,106,0.24) !important;
+  background: rgba(0,0,0,0.20) !important;
+  gap: 18px !important;
+}
+.contact-link:hover {
+  background: rgba(185,227,106,0.06) !important;
+  border-color: rgba(185,227,106,0.72) !important;
+  transform: translateY(-1px);
+}
+.cl-label {
+  color: var(--accent) !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.08em !important;
+}
+.cl-val {
+  color: var(--text) !important;
+  font-size: 16px !important;
+  font-weight: 650 !important;
+  overflow-wrap: anywhere;
+}
+.cl-arrow {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  justify-self: end;
+  color: var(--action) !important;
+  border: 1px solid rgba(118,161,255,0.38);
+  background: rgba(118,161,255,0.08);
+}
+.flow-wrap {
+  border: 1px solid rgba(185,227,106,0.42) !important;
+  box-shadow: 0 40px 120px rgba(0,0,0,0.30), 0 0 0 1px rgba(185,227,106,0.08) !important;
+}
+.workflow-map {
+  border: 0 !important;
+}
+.wf-detail {
+  border-left: 1px solid rgba(185,227,106,0.22) !important;
+}
+@media (max-width: 920px) {
+  .contact {
+    grid-template-columns: 1fr !important;
+  }
+  .contact-h2 {
+    max-width: 12ch !important;
+  }
+}
+
+/* Payload Email Rail */
+.term-detail .email-block {
+  border-left: 2px solid var(--accent) !important;
+  border-top-color: rgba(255,255,255,0.06) !important;
+  border-right-color: rgba(255,255,255,0.06) !important;
+  border-bottom-color: rgba(255,255,255,0.06) !important;
+  background: rgba(255,255,255,0.026) !important;
+}
+
+/* Consistent Section Table Frames */
+.terminal,
+.forensic-lab,
+.flow-wrap,
+.agent-showcase,
+.contact-links {
+  border: 1px solid rgba(185,227,106,0.42) !important;
+  box-shadow: 0 40px 120px rgba(0,0,0,0.30), 0 0 0 1px rgba(185,227,106,0.08) !important;
+}
+.forensic-lab,
+.agent-showcase,
+.contact-links {
+  background: linear-gradient(180deg, rgba(255,255,255,0.026), rgba(255,255,255,0.012)) !important;
+}
+.terminal {
+  border-width: 1px !important;
+}
+.forensic-panel:first-child {
+  border-left: 0 !important;
+}
+.forensic-panel:last-child {
+  border-right: 0 !important;
+}
+.agent-card,
+.agent-prompt-grid .prompt-excerpt-column,
+.contact-link {
+  border-width: 1px !important;
+}
+
+/* Plumbing Internal Frame Contrast */
+.flow-stage {
+  border-top: 1px solid rgba(185,227,106,0.38) !important;
+}
+.workflow-map {
+  border: 1px solid rgba(185,227,106,0.34) !important;
+  box-shadow: inset 0 0 0 1px rgba(118,161,255,0.10) !important;
+}
+.wf-detail {
+  border-left: 1px solid rgba(185,227,106,0.42) !important;
+  box-shadow: inset 1px 0 0 rgba(118,161,255,0.16) !important;
+}
+.wf-card {
+  border-color: rgba(255,255,255,0.26) !important;
+}
+.wf-card.agent {
+  border-color: rgba(185,227,106,0.56) !important;
+}
+.wf-card.memory {
+  border-color: rgba(118,161,255,0.42) !important;
+}
+
+/* Operator Outreach CTA Polish */
+.contact-cta {
+  width: fit-content !important;
+  margin-top: 10px !important;
+  padding: 18px 24px !important;
+  color: var(--text) !important;
+  background: linear-gradient(135deg, rgba(185,227,106,0.14), rgba(118,161,255,0.07)) !important;
+  border: 1px solid rgba(185,227,106,0.72) !important;
+  box-shadow: 0 18px 50px rgba(0,0,0,0.34), inset 0 0 0 1px rgba(255,255,255,0.04) !important;
+  letter-spacing: 0 !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+.contact-cta::before {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+  background: var(--accent);
+}
+.contact-cta::after {
+  content: '';
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  border-top: 2px solid var(--action);
+  border-right: 2px solid var(--action);
+  transform: translateY(-50%) rotate(45deg);
+  opacity: 0.95;
+}
+.contact-cta:hover {
+  color: var(--bg) !important;
+  background: var(--accent) !important;
+  border-color: var(--accent) !important;
+  transform: translateY(-2px);
+}
+.contact-cta:hover::before {
+  background: var(--bg);
+}
+.contact-cta:hover::after {
+  border-color: var(--bg);
+}
+
+/* Playbook Top Border Cleanup */
+.forensic-lab {
+  overflow: hidden !important;
+}
+.forensic-lab .forensic-panel {
+  border-top: 0 !important;
+  border-bottom: 0 !important;
+}
+
+/* Final Bold Frame System */
+.terminal,
+.forensic-lab,
+.flow-wrap,
+.agent-showcase,
+.contact-links {
+  border-width: 2px !important;
+  border-style: solid !important;
+  border-color: rgba(185,227,106,0.50) !important;
+  box-shadow: 0 42px 120px rgba(0,0,0,0.34), 0 0 0 1px rgba(185,227,106,0.10) !important;
+}
+.agent-card,
+.agent-prompt-grid .prompt-excerpt-column {
+  border-width: 2px !important;
+  border-style: solid !important;
+}
+.agent-card.ahab-card,
+.prompt-excerpt-column.ahab-prompt {
+  border-color: rgba(185,227,106,0.64) !important;
+}
+.agent-card.nemo-card,
+.prompt-excerpt-column.nemo-prompt {
+  border-color: rgba(118,161,255,0.66) !important;
+}
+.agent-card.neptune-card,
+.prompt-excerpt-column.neptune-prompt {
+  border-color: rgba(215,183,255,0.66) !important;
+}
+.agent-prompt-grid .prompt-excerpt-column {
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.035), 0 18px 50px rgba(0,0,0,0.24) !important;
+}
+.agent-card {
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.035), 0 16px 42px rgba(0,0,0,0.22) !important;
+}
+.workflow-map,
+.wf-detail,
+.contact-link {
+  border-width: 2px !important;
+}
+.forensic-lab .forensic-panel {
+  border-top: 0 !important;
+  border-bottom: 0 !important;
+}
+
+/* Secondary Border Audit Cleanup */
+.workflow-map {
+  box-shadow: none !important;
+}
+.wf-detail {
+  box-shadow: none !important;
+}
+.agent-card::before,
+.agent-prompt-grid .prompt-excerpt-column::before {
+  content: none !important;
+  display: none !important;
+}
+.forensic-panel::before {
+  width: 3px !important;
+  opacity: 0.95 !important;
+}
+.raw-card,
+.diagnostic-card,
+.message-card,
+.bite-card,
+.d-bite,
+.email-block {
+  box-shadow: none !important;
+}
+.diagnostic-card,
+.bite-card,
+.term-detail .d-bite,
+.term-detail .email-block {
+  border-left-width: 3px !important;
+}
+
+/* Playbook Column Card Treatment */
+.forensic-lab {
+  gap: 18px !important;
+  padding: 18px !important;
+  background: linear-gradient(180deg, rgba(255,255,255,0.026), rgba(255,255,255,0.010)) !important;
+}
+.forensic-lab .forensic-panel {
+  border: 2px solid rgba(185,227,106,0.30) !important;
+  background: rgba(0,0,0,0.18) !important;
+  padding: 24px !important;
+  overflow: hidden !important;
+}
+.forensic-lab .forensic-panel:first-child,
+.forensic-lab .forensic-panel:last-child {
+  border: 2px solid rgba(185,227,106,0.30) !important;
+}
+.forensic-lab .forensic-panel::before {
+  content: none !important;
+  display: none !important;
+}
+.forensic-lab .forensic-panel:hover {
+  border-color: rgba(185,227,106,0.48) !important;
+  background: rgba(185,227,106,0.025) !important;
+}
+@media (max-width: 1100px) {
+  .forensic-lab .forensic-panel {
+    border: 2px solid rgba(185,227,106,0.30) !important;
+  }
+}
+
+/* Stranger Signal Inner Card Border */
+.forensic-lab .forensic-panel:first-child .raw-card {
+  border: 2px solid rgba(185,227,106,0.28) !important;
+  background: rgba(255,255,255,0.024) !important;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.025) !important;
+}
+.forensic-lab .forensic-panel:first-child .raw-card:hover {
+  border-color: rgba(185,227,106,0.46) !important;
+}
+
+/* Playbook Rounded Card Geometry */
+.forensic-lab,
+.forensic-lab .forensic-panel,
+.forensic-lab .raw-card,
+.forensic-lab .diagnostic-card,
+.forensic-lab .message-card,
+.forensic-lab .bite-card {
+  border-radius: 8px !important;
+}
+.forensic-lab .forensic-panel {
+  overflow: hidden !important;
+}
+.dictionary-btn {
+  border-radius: 7px !important;
+}
 </style>
 </head>
 <body>
@@ -2643,12 +3371,12 @@ footer {
     <div class="term-body">
       <div class="term-list">
         <div class="term-head">
-          <span>company</span>
-          <span>contact</span>
-          <span>primary_signal</span>
-          <span>funding_signal</span>
-          <span>hook</span>
-          <span>outreach_email</span>
+          <span>Company</span>
+          <span>Prospect</span>
+          <span>Signal</span>
+          <span>Funding</span>
+          <span>Hook</span>
+          <span>Email</span>
         </div>
         <div id="term-rows"></div>
       </div>
@@ -2735,7 +3463,7 @@ Would you be open to chatting?</div>
   <div class="section-label reveal" data-num="03">The Plumbing</div>
   <h2 class="process-h2 reveal">Find. Extract. Transform. <em>Export.</em></h2>
   <p class="process-lead reveal">
-    This is the handoff machine behind the payload. <span class="em">Each node finds evidence, cleans the record, diagnoses the friction, or preserves context for the next stage. Select any node or memory chip to inspect the handoff.</span>
+    This is the handoff machine behind the payload. Each node finds evidence, cleans the record, diagnoses the friction, or preserves context for the next stage. <span class="em">Select any node or memory chip to inspect the handoff.</span>
   </p>
 
   <div class="flow-wrap reveal">
@@ -2986,7 +3714,7 @@ const forensicDictionary = {
     use: 'Enter their mental conversation about disconnected systems. Name the coordination tax before offering automation.',
     payload: 'company: Crux Climate\nfunding_signal: $50M Series B · Apr 2025\nfriction_type: API Stutter\nevidence: HubSpot workflows + Clay + Apollo\nwriter_instruction: Open with funding, then pivot to disconnected GTM handoffs.',
     hook: 'Saw the $50M Series B and the role calling out HubSpot workflows plus Clay and Apollo list building. That is usually the point where the GTM stack starts creating its own coordination tax. The useful work is making enrichment, routing, and CRM updates behave like one system instead of several tabs.',
-    email: 'Hi there,\n\nSaw the $50M Series B and the role calling out HubSpot workflows plus Clay and Apollo list building. That is usually the point where the GTM stack starts creating its own coordination tax.\n\nIf I could help keep enrichment, routing, and CRM updates behaving like one system instead of several tabs, I would start with the handoff between Clay outputs and HubSpot workflows.\n\nWorth a quick conversation?\n\nRegards,\nRaymond'
+    email: "Hi there,\n\nCongratulations on the $50M Series B. That is a pivotal moment, and it usually brings more volume, more handoffs, and less room for messy data.\n\nI noticed that pressure showing up in your Marketing Ops opening, especially around the HubSpot, Clay, and Apollo requirements. That combination often points to useful GTM tools creating coordination work instead of removing it.\n\nIf I could help make enrichment, routing, and CRM updates behave like one system, I would start by mapping the handoff between Clay outputs and the HubSpot fields or workflows that need to receive them.\n\nIf that would be useful, I would be glad to compare notes.\n\nRegards,\nRaymond"
   },
   scale: {
     name: 'Scale Friction',
@@ -2994,7 +3722,7 @@ const forensicDictionary = {
     use: 'Address the fear of breaking during growth. The message should sound operational, not motivational.',
     payload: 'company: Crux Climate\nfunding_signal: $50M Series B · Apr 2025\nfriction_type: Scale Friction\nevidence: funded team + Marketing Ops hiring\nwriter_instruction: Open with momentum, then point to the risk of growth hiding process cracks.',
     hook: 'Saw the $50M Series B and the Marketing Ops Associate role. That is usually when the team has enough momentum that small workflow gaps start turning into reporting and routing drag. The useful work is keeping the GTM system legible before volume makes every handoff harder to inspect.',
-    email: 'Hi there,\n\nSaw the $50M Series B and the Marketing Ops Associate role. That is usually when the team has enough momentum that small workflow gaps start turning into reporting and routing drag.\n\nIf I could help keep the GTM system legible before volume makes every handoff harder to inspect, I would start with the workflow and source-data checks around HubSpot.\n\nWorth a quick conversation?\n\nRegards,\nRaymond'
+    email: "Hi there,\n\nCongratulations on the $50M Series B. That is a pivotal moment, and it usually brings more volume, more handoffs, and less room for messy data.\n\nI noticed that pressure showing up in your Marketing Ops Associate opening, especially around workflow capacity and HubSpot operations. That combination often points to growth moving faster than the operating system underneath it.\n\nIf I could help keep the GTM system legible before volume makes every handoff harder to inspect, I would start with the workflow and source-data checks around HubSpot.\n\nIf that would be useful, I would be glad to compare notes.\n\nRegards,\nRaymond"
   },
   manual: {
     name: 'Manual Data Debt',
@@ -3002,7 +3730,7 @@ const forensicDictionary = {
     use: 'Appeal to efficiency. The villain is copy-paste cleanup and repeated record repair.',
     payload: 'company: Crux Climate\nfunding_signal: $50M Series B · Apr 2025\nfriction_type: Manual Data Debt\nevidence: prospecting list maintenance + HubSpot workflows\nwriter_instruction: Open with funding, then name manual cleanup before reporting.',
     hook: 'Saw the $50M Series B and the need to maintain prospecting lists across Clay, Apollo, and HubSpot. That is where manual data debt usually starts hiding inside normal marketing ops work. The useful move is standardizing the record before it turns into cleanup inside the CRM.',
-    email: 'Hi there,\n\nSaw the $50M Series B and the need to maintain prospecting lists across Clay, Apollo, and HubSpot. That is where manual data debt usually starts hiding inside normal marketing ops work.\n\nIf I could help standardize the record before it turns into cleanup inside the CRM, I would start with the table structure and the handoff fields HubSpot needs to receive cleanly.\n\nWorth a quick conversation?\n\nRegards,\nRaymond'
+    email: "Hi there,\n\nCongratulations on the $50M Series B. That is a pivotal moment, and it usually brings more volume, more handoffs, and less room for messy data.\n\nI noticed that pressure showing up in the list maintenance across Clay, Apollo, and HubSpot. That combination often points to manual data debt hiding upstream of reporting and CRM workflows.\n\nIf I could help standardize the record before it turns into CRM cleanup, I would start with the table structure and the handoff fields HubSpot needs to receive cleanly.\n\nIf that would be useful, I would be glad to compare notes.\n\nRegards,\nRaymond"
   },
   displacement: {
     name: 'Displacement Signal',
@@ -3010,7 +3738,7 @@ const forensicDictionary = {
     use: 'Mirror the cost of the current workaround versus the focused workflow that should replace it.',
     payload: 'company: Crux Climate\nfunding_signal: $50M Series B · Apr 2025\nfriction_type: Displacement Signal\nevidence: Clay + Apollo + HubSpot stack\nwriter_instruction: Open with funding, then name tool sprawl as the villain.',
     hook: 'Saw the $50M Series B and the stack spanning Clay, Apollo, and HubSpot. That can be a strong setup, but it also creates a displacement problem when every tool owns a piece of the workflow and no one owns the handoff. The useful work is making the table decide what each system should receive.',
-    email: 'Hi there,\n\nSaw the $50M Series B and the stack spanning Clay, Apollo, and HubSpot. That can be a strong setup, but it also creates a displacement problem when every tool owns a piece of the workflow and no one owns the handoff.\n\nIf I could help make the table decide what each system should receive, I would start by turning the enrichment output into fields HubSpot can actually use.\n\nWorth a quick conversation?\n\nRegards,\nRaymond'
+    email: "Hi there,\n\nCongratulations on the $50M Series B. That is a pivotal moment, and it usually brings more volume, more handoffs, and less room for messy data.\n\nI noticed that pressure showing up in the stack spanning Clay, Apollo, and HubSpot. That combination often points to a workflow where several tools touch the record but no one fully owns the handoff.\n\nIf I could help clarify what each system should receive, I would start by turning the enrichment output into fields HubSpot can actually use.\n\nIf that would be useful, I would be glad to compare notes.\n\nRegards,\nRaymond"
   }
 };
 
@@ -3046,56 +3774,83 @@ function cleanBite(text) {
 }
 
 function emailPayload(l) {
-  const bite = cleanBite(l.bite);
   const isTeam = /hiring team/i.test(l.contact);
-  const funding = l.fund ? l.fund.split('·')[0].trim() : '';
-  const role = l.title || 'the role';
-  const company = l.co || 'the team';
-
   const frames = {
     'API Stutter': {
-      offer: 'make the handoff between enrichment, routing, and CRM updates behave like one operating layer',
-      system: 'a Clay-style review table that keeps source data, friction, and next action attached before HubSpot receives the record',
-      proof: 'I recently rebuilt this exact handoff problem inside Reverse Engineering Clay: source discovery, evidence checks, friction diagnosis, and CRM-ready payloads.',
-      ctaPerson: 'Would it be useful if I sent over the payload logic I would test first?',
-      ctaTeam: 'Would it be useful if I sent over the handoff logic I would test against this role?'
+      result: 'make enrichment, routing, and CRM updates behave like one system',
+      approach: 'mapping the handoff between Clay-style outputs, HubSpot-ready fields, and the review step before automation runs',
+      diagnosis: 'That combination often points to useful GTM tools creating coordination work instead of removing it.'
     },
     'Manual Data Debt': {
-      offer: 'remove the cleanup layer before it reaches reporting, routing, or dashboard work',
-      system: 'a structured enrichment table that standardizes the record before humans are forced to reconcile it downstream',
-      proof: 'That is the same pattern I pressure-tested in Reverse Engineering Clay: messy rows had to become reviewable GTM payloads before they were allowed near outreach.',
-      ctaPerson: 'Would a quick example of that cleanup layer be useful?',
-      ctaTeam: 'Would it be useful if I shared the review structure I would start with?'
+      result: 'reduce cleanup before GTM data reaches reporting or CRM workflows',
+      approach: 'standardizing the record shape first: source evidence, friction signal, funding context, and the fields HubSpot or Salesforce needs to receive cleanly',
+      diagnosis: 'That combination often points to manual data debt hiding upstream of reporting and CRM workflows.'
     },
     'Scale Friction': {
-      offer: 'keep revenue data legible while hiring, volume, and process complexity increase',
-      system: 'a lightweight QA loop that checks source data, routing logic, and lifecycle handoffs before scale hides the cracks',
-      proof: 'I built Reverse Engineering Clay around that exact constraint: the row had to carry enough context to survive the next stage instead of being rediscovered from scratch.',
-      ctaPerson: 'Worth comparing notes on where the first handoff usually bends?',
-      ctaTeam: 'Would it help if I shared the scale-friction checklist I would use for this role?'
+      result: 'keep the GTM system legible as volume increases',
+      approach: 'turning source data, routing, and reporting into a reviewable operating loop before the next workflow is automated',
+      diagnosis: 'That combination often points to growth moving faster than the operating system underneath it.'
     },
     'Displacement Signal': {
-      offer: 'turn the tool stack into a cleaner specialist workflow instead of asking every platform to own part of the job',
-      system: 'a table-first handoff that decides what each system should receive before the workflow spreads across tabs',
-      proof: 'Reverse Engineering Clay forced that lesson early: the model mattered less than whether the payload told each tool what job it was supposed to do.',
-      ctaPerson: 'Worth a quick look at where the handoff could be simplified?',
-      ctaTeam: 'Would it be useful if I shared how I would map the handoff for this role?'
+      result: 'clarify what each system should own before the workflow spreads across more tools',
+      approach: 'making the table define what Clay, Apollo, HubSpot, or Salesforce should receive instead of letting each tool carry a different version of the record',
+      diagnosis: 'That combination often points to a workflow where several tools touch the record but no one fully owns the handoff.'
     }
   };
-
   const frame = frames[l.fr] || frames['API Stutter'];
-  const proofLine = funding ? frame.proof + ' The ' + funding + ' signal makes the timing sharper, but the real issue is the operating pressure underneath it.' : frame.proof;
-  const cta = isTeam ? frame.ctaTeam : frame.ctaPerson;
-
+  const opening = fundingOpening(l);
+  const pressure = pressureLine(l);
+  const clue = evidenceClue(l);
+  const ask = 'If that would be useful, I would be glad to compare notes.';
   const email = 'Hi ' + firstName(l) + ',\n\n' +
-    bite + '\n\n' +
-    'If I could help ' + offerLead(l, frame.offer) + ' using ' + frame.system + ', that is where I would start.\n\n' +
-    proofLine + '\n\n' +
-    cta + '\n\n' +
+    opening + ' ' + pressure + '\n\n' +
+    'I noticed that pressure showing up in your ' + roleOpening(l) + ', especially around ' + clue + '. ' + frame.diagnosis + '\n\n' +
+    'If I could help ' + frame.result + ', I would start by ' + frame.approach + '.\n\n' +
+    ask + '\n\n' +
     'Regards,\nRaymond';
-  return {email};
+  return { email };
 }
 
+function fundingOpening(l) {
+  const fund = (l.fund || '').trim();
+  if (!fund) return 'I noticed the ' + l.title + ' role and the operating pressure behind it.';
+  if (/acquired by/i.test(fund)) {
+    const buyer = fund.replace(/Acquired by/i, '').split('·')[0].trim();
+    return 'Congratulations on the ' + buyer + ' acquisition.';
+  }
+  return 'Congratulations on ' + cleanFundingSignal(fund) + '.';
+}
+
+function pressureLine(l) {
+  const fund = (l.fund || '').trim();
+  if (!fund) return 'Roles like that usually reveal where a workflow is starting to ask for more structure.';
+  if (/acquired by/i.test(fund)) return 'That is a pivotal transition, and it usually brings more scrutiny, more handoffs, and less room for messy data.';
+  return 'That is a pivotal moment, and it usually brings more volume, more handoffs, and less room for messy data.';
+}
+
+function roleOpening(l) {
+  const title = (l.title || 'open role').trim();
+  return title + ' opening';
+}
+
+function evidenceClue(l) {
+  const source = (l.role + ' ' + l.title + ' ' + l.bite).toLowerCase();
+  if (source.includes('hubspot') && source.includes('clay') && source.includes('apollo')) return 'the HubSpot, Clay, and Apollo requirements';
+  if (source.includes('hubspot') && source.includes('salesforce')) return 'the HubSpot and Salesforce handoff';
+  if (source.includes('salesforce') && (source.includes('dashboard') || source.includes('source data'))) return 'Salesforce source data and dashboard reliability';
+  if (source.includes('bi') || source.includes('reporting') || source.includes('dashboard')) return 'reporting, BI, and CRM data quality';
+  if (source.includes('hubspot') && source.includes('workflow')) return 'HubSpot workflows';
+  if (source.includes('crm')) return 'CRM administration and data handoffs';
+  if (source.includes('routing')) return 'routing and workflow ownership';
+  return 'the operating requirements behind the role';
+}
+
+function cleanFundingSignal(fund) {
+  const main = fund.split('·')[0].trim();
+  if (!main) return 'the recent funding milestone';
+  if (/^\$/.test(main) || /series/i.test(main) || /round/i.test(main)) return 'the ' + main;
+  return 'the recent funding milestone';
+}
 function offerLead(l, offer) {
   if (/HubSpot/i.test(l.role + ' ' + l.title + ' ' + l.bite)) return offer + ' around HubSpot';
   if (/Salesforce/i.test(l.role + ' ' + l.title + ' ' + l.bite)) return offer + ' around Salesforce';
@@ -3108,6 +3863,7 @@ function showDetail(l) {
   const linkedInRow = l.li ? `<div class="raw-row"><div class="raw-k">LinkedIn</div><div class="raw-v"><a href="https://${l.li}">${l.li}</a></div></div>` : '';
   const fundingRow = l.fund ? `<div class="raw-row"><div class="raw-k">Funding Signal</div><div class="raw-v"><span class="d-fund">${l.fund}</span></div></div>` : '';
   detEl.innerHTML = `
+    <div class="dl detail-section-label profile-label">Prospect Profile</div>
     <div class="raw-card">
       <div class="raw-row">
         <div class="raw-k">Company</div>
@@ -3129,9 +3885,9 @@ function showDetail(l) {
       </div>
       ${fundingRow}
     </div>
-    <div class="dl">Hook</div>
+    <div class="dl detail-section-label">Hook</div>
     <div class="d-bite">"${l.bite}"</div>
-    <div class="dl" style="margin-top:18px">Email</div>
+    <div class="dl detail-section-label">Email</div>
     <div class="email-block">${escapeHtml(email.email)}</div>
   `;
 }
