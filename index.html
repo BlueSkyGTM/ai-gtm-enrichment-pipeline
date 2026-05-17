@@ -465,25 +465,50 @@ button:focus-visible,
   white-space: nowrap;
 }
 .tr-bite-cell {
-  font-family: 'DM Sans', sans-serif;
-  font-size: 12px;
-  line-height: 1.45;
-  color: var(--text);
-  display: -webkit-box;
-  -webkit-line-clamp: 4;
+  padding: 12px 16px;
+  color: inherit;               /* Follows row select states naturally */
+  font-size: 11.5px;
+  font-family: monospace;
+  display: -webkit-box;         /* Multi-line box engine */
+  -webkit-line-clamp: 4;        /* Strict 4-line limit */
   -webkit-box-orient: vertical;
-  overflow: hidden;
+  overflow: hidden;             /* Clips extra content bounds vertically */
+  white-space: normal !important; 
+  word-break: break-word;       
+  
+  /* The Vertical Downward Fade Mask */
+  -webkit-mask-image: linear-gradient(180deg, #000 65%, transparent 100%);
+  mask-image: linear-gradient(180deg, #000 65%, transparent 100%);
 }
 .tr-email-cell {
-  font-family: 'DM Sans', sans-serif;
-  font-size: 12px;
-  line-height: 1.45;
-  color: var(--text);
-  white-space: pre-line;
-  display: -webkit-box;
-  -webkit-line-clamp: 5;
+  padding: 12px 16px;
+  color: inherit;               /* Follows row select states naturally */
+  font-size: 11.5px;
+  font-family: monospace;
+  display: -webkit-box;         /* Multi-line box engine */
+  -webkit-line-clamp: 5;        /* Strict 5-line limit */
   -webkit-box-orient: vertical;
-  overflow: hidden;
+  overflow: hidden;             /* Clips extra content bounds vertically */
+  white-space: normal !important; 
+  word-break: break-word;       
+  
+  /* The Horizontal Edge Fade Mask */
+  -webkit-mask-image: linear-gradient(90deg, #000 82%, transparent 98%);
+  mask-image: linear-gradient(90deg, #000 82%, transparent 98%);
+}
+  
+  /* Hard Multi-Line Word Boundary Clamping */
+  display: -webkit-box;
+  -webkit-line-clamp: 5;        /* Strictly clamps text at line 5 */
+  -webkit-box-orient: vertical;
+  overflow: hidden;             /* Completely hides any characters past the line limit */
+  text-overflow: ellipsis;      /* Correctly forces '...' right at the boundary */
+  white-space: normal !important; /* Overrides any global white-space inherits to force wrapping */
+  word-break: break-word;       /* Breaks layout at words natively */
+  
+  /* The Absolute Track Lock Constraints */
+  max-width: 100% !important;   /* Forces sentence strings to treat the track grid wall as a hard stop */
+  box-sizing: border-box !important;
 }
 .term-row.on .tr-bite-cell,
 .term-row.on .tr-email-cell { color: var(--text); }
@@ -899,17 +924,6 @@ button:focus-visible,
   top: 0;
   bottom: 0;
   border-left: 1px solid rgba(118,161,255,0.42);
-}
-.wf-transfer::after {
-  content: '';
-  position: absolute;
-  left: calc(50% - 3px);
-  bottom: -1px;
-  width: 7px;
-  height: 7px;
-  border-right: 1px solid rgba(118,161,255,0.7);
-  border-bottom: 1px solid rgba(118,161,255,0.7);
-  transform: rotate(45deg);
 }
 .wf-chip {
   position: relative;
@@ -2747,16 +2761,22 @@ footer {
   background: var(--surface) !important;
 }
 .term-head {
-  position: sticky !important;
-  top: 0 !important;
-  left: 0 !important;
-  width: max-content !important;
-  background: #101010 !important;
-  z-index: 4 !important;
+  display: grid;
+  grid-template-columns: var(--lead-grid);
+  border-bottom: 1px solid var(--border);
+  background: #0d0d0d;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  align-items: stretch; /* Synchronizes the header height layout */
 }
-#term-rows {
-  width: max-content !important;
-  min-width: 100% !important;
+.term-row {
+  display: grid;
+  grid-template-columns: var(--lead-grid);
+  border-bottom: 1px solid var(--border);
+  transition: background 0.12s ease;
+  align-items: stretch; /* Forces all role columns to expand together vertically */
+  height: auto;
 }
 .term-detail {
   position: relative !important;
@@ -2965,7 +2985,15 @@ footer {
   border: 2px solid rgba(185,227,106,0.24) !important;
 }
 .wf-detail {
-  border-left: 2px solid rgba(185,227,106,0.24) !important;
+  /* Frame all sides cleanly */
+  border: 1px solid rgba(185, 227, 106, 0.34) !important;
+  /* Keep the left border slightly darker to match the grid divider precisely */
+  border-left: 1px solid rgba(185, 227, 106, 0.42) !important;
+
+  /* Structural lighting glow and baseline padding */
+  box-shadow: inset 1px 1px 0 rgba(118, 161, 255, 0.10) !important;
+  padding: 24px !important;
+  background: var(--surface) !important;
 }
 /* Operator + Plumbing Final Polish */
 .contact {
@@ -2991,20 +3019,22 @@ footer {
   color: var(--text) !important;
   max-width: 620px !important;
 }
-.contact-links {
-  gap: 14px !important;
-  padding: 18px !important;
-  background: linear-gradient(180deg, rgba(255,255,255,0.035), rgba(255,255,255,0.012)) !important;
-  border: 1px solid rgba(185,227,106,0.42) !important;
-  box-shadow: 0 40px 120px rgba(0,0,0,0.30), 0 0 0 1px rgba(185,227,106,0.08) !important;
+.contact-links-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 .contact-link {
+  display: grid;
   grid-template-columns: 96px 1fr 34px !important;
   min-height: 76px !important;
   padding: 18px 20px !important;
-  border: 2px solid rgba(185,227,106,0.24) !important;
+  border: 1px solid rgba(185,227,106,0.35) !important;
   background: rgba(0,0,0,0.20) !important;
   gap: 18px !important;
+  border-radius: 8px !important;
+  margin-bottom: 0 !important;
+  text-decoration: none;
 }
 .contact-link:hover {
   background: rgba(185,227,106,0.06) !important;
@@ -3295,6 +3325,13 @@ footer {
 .dictionary-btn {
   border-radius: 7px !important;
 }
+/* ==========================================
+   REMOVE GRAPH NODE CONNECTOR PORT DOTS
+   ========================================== */
+.wf-node::before,
+.wf-node.seed::before {
+  display: none !important;
+}
 </style>
 </head>
 <body>
@@ -3366,7 +3403,6 @@ footer {
       <div class="td td-r"></div>
       <div class="td td-y"></div>
       <div class="td td-g"></div>
-      <div class="term-title">GTM Career Leads · Funded Samples · HubSpot-ready review view</div>
     </div>
     <div class="term-body">
       <div class="term-list">
@@ -3467,7 +3503,7 @@ Would you be open to chatting?</div>
   </p>
 
   <div class="flow-wrap reveal">
-    <div class="flow-caption">// Interactive Backend Workflow Map</div>
+    <!-- <div class="flow-caption">Interactive Backend Workflow Map</div> -->
     <div class="flow-stage">
       <div class="workflow-map has-panel" aria-label="Clickable backend enrichment workflow map">
         <div class="wf-grid">
@@ -3655,7 +3691,7 @@ Would you be open to chatting?</div>
     </p>
     <a class="contact-cta" href="mailto:raymondf.gtm@gmail.com">Get in Touch →</a>
   </div>
-  <div class="contact-links reveal">
+ <div class="contact-links-container reveal">
     <a class="contact-link" href="mailto:raymondf.gtm@gmail.com">
       <span class="cl-label">Email</span>
       <span class="cl-val">raymondf.gtm@gmail.com</span>
