@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fleet Engine — Architecture Log</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0A0A0A;
+  --surface: #111111;
+  --surface2: #161616;
+  --border: #1E1E1E;
+  --border2: #2A2A2A;
+  --text: #E6E6E6;
+  --text-soft: #E6E6E6;
+  --muted: #6A6A6A;
+  --dim: #2E2E2E;
+  --accent: #B9E36A;
+  --action: #76A1FF;
+  --action-soft: rgba(118,161,255,0.12);
+  --action-line: rgba(118,161,255,0.44);
+  --red: #FF5555;
+  --white: #FFFFFF;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  overflow-x: hidden;
+  font-feature-settings: "ss01", "ss02";
+  line-height: 1.65;
+}
+
+/* GRAIN OVERLAY */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.02'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 9998;
+  opacity: 0.35;
+  mix-blend-mode: overlay;
+}
+
+a { color: var(--action); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.page {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 48px 24px 64px;
+}
+
+/* NAV MATCH */
+.doc-nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  height: 60px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(10,10,10,0.92);
+  backdrop-filter: blur(16px);
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.nav-id {
+  font-size: 13px;
+  color: var(--text);
+  font-weight: 500;
+  letter-spacing: 0;
+}
+.nav-id .sub { color: var(--muted); font-weight: 400; margin-left: 4px; }
+
+.nav-links { display: flex; gap: 20px; }
+.nav-links a {
+  font-size: 13px;
+  color: var(--muted);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.nav-links a:hover { color: var(--text); }
+
+/* HEADER */
+.doc-header {
+  margin-bottom: 56px;
+  padding-bottom: 32px;
+  border-bottom: 1px solid var(--border);
+}
+
+.doc-eyebrow {
+  font-size: 11px;
+  color: var(--accent);
+  letter-spacing: 0.04em;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.doc-eyebrow::before {
+  content: '';
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 12px var(--accent);
+}
+
+.doc-title {
+  font-size: clamp(36px, 5vw, 56px);
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  margin-bottom: 20px;
+}
+.doc-title em { font-style: normal; color: var(--accent); }
+
+.doc-subtitle {
+  color: var(--text-soft);
+  font-size: 17px;
+  font-weight: 300;
+  max-width: 640px;
+  line-height: 1.6;
+}
+
+/* THESIS BOX */
+.thesis {
+  margin-bottom: 56px;
+  padding: 24px;
+  border: 1px solid rgba(185,227,106,0.42);
+  background: rgba(185,227,106,0.04);
+  box-shadow: 0 40px 120px rgba(0,0,0,0.30), 0 0 0 1px rgba(185,227,106,0.08);
+}
+
+.thesis p {
+  color: var(--text);
+  font-size: 15px;
+  line-height: 1.75;
+  font-weight: 300;
+}
+.thesis p + p { margin-top: 12px; }
+.thesis strong { color: var(--accent); font-weight: 500; }
+
+/* SECTION HEADS */
+.section-head {
+  margin-bottom: 24px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.section-label {
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.section-title {
+  font-size: 28px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+.section-title em { font-style: normal; color: var(--accent); }
+
+/* PHASE BLOCKS */
+.phase {
+  margin-bottom: 48px;
+  border: 1px solid var(--border2);
+  background: var(--surface);
+  overflow: hidden;
+}
+
+.phase-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface2);
+}
+
+.phase-group {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+}
+
+.phase-tag {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 4px 8px;
+  border: 1px solid;
+}
+.phase-tag.governance { color: var(--action); border-color: rgba(118,161,255,0.44); background: rgba(118,161,255,0.08); }
+.phase-tag.state { color: var(--accent); border-color: rgba(185,227,106,0.44); background: rgba(185,227,106,0.08); }
+.phase-tag.edge { color: var(--red); border-color: rgba(255,85,85,0.44); background: rgba(255,85,85,0.08); }
+
+.phase-name {
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--text);
+}
+
+.phase-count {
+  font-size: 11px;
+  color: var(--muted);
+  font-weight: 500;
+}
+
+/* BUG ENTRIES */
+.bug {
+  display: grid;
+  grid-template-columns: 42px 1fr;
+  gap: 16px;
+  padding: 18px 24px;
+  border-bottom: 1px solid var(--border);
+  align-items: start;
+  transition: background 0.2s;
+}
+.bug:last-child { border-bottom: none; }
+.bug:hover { background: rgba(118,161,255,0.05); }
+
+.bug-index {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+  padding-top: 2px;
+  text-align: right;
+}
+
+.bug-content { min-width: 0; }
+
+.bug-title {
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+
+.bug-failure {
+  color: var(--text-soft);
+  font-size: 14px;
+  line-height: 1.6;
+  font-weight: 300;
+  margin-bottom: 10px;
+}
+
+.bug-fix {
+  padding: 12px 16px;
+  border-left: 3px solid var(--accent);
+  background: rgba(185,227,106,0.04);
+  color: var(--text);
+  font-size: 13px;
+  line-height: 1.55;
+  font-family: 'DM Sans', monospace;
+  font-weight: 500;
+}
+
+/* ARCHITECTURE DECISIONS */
+.decisions {
+  margin-top: 56px;
+  margin-bottom: 48px;
+  display: grid;
+  gap: 12px;
+}
+
+.decision {
+  padding: 20px 24px;
+  border: 1px solid var(--border2);
+  background: var(--surface);
+  transition: background 0.2s;
+}
+.decision:hover { background: var(--surface2); }
+
+.decision-title {
+  font-size: 12px;
+  color: var(--accent);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.decision-body {
+  color: var(--text-soft);
+  font-size: 14px;
+  line-height: 1.65;
+  font-weight: 300;
+}
+.decision-body strong { color: var(--text); font-weight: 500; }
+
+/* KNOWN GAPS */
+.gaps {
+  margin-bottom: 48px;
+  display: grid;
+  gap: 10px;
+}
+
+.gap {
+  padding: 16px 20px;
+  border-left: 3px solid var(--action);
+  background: var(--action-soft);
+  color: var(--text-soft);
+  font-size: 14px;
+  line-height: 1.6;
+  font-weight: 300;
+}
+.gap strong { color: var(--text); font-weight: 500; }
+
+/* ENGINEER CTA */
+.eng-cta {
+  margin-top: 64px;
+  padding-top: 48px;
+  border-top: 1px solid var(--border);
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 64px;
+  align-items: center;
+}
+
+.eng-cta-title {
+  font-size: clamp(32px, 4vw, 48px);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  margin-bottom: 16px;
+}
+.eng-cta-title em { font-style: normal; color: var(--accent); }
+
+.eng-cta-sub {
+  color: var(--text-soft);
+  font-size: 16px;
+  line-height: 1.6;
+  font-weight: 300;
+  margin-bottom: 28px;
+  max-width: 480px;
+}
+
+.eng-cta-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  padding: 14px 24px;
+  background: linear-gradient(135deg, rgba(185,227,106,0.14), rgba(118,161,255,0.07));
+  border: 1px solid rgba(185,227,106,0.72);
+  border-radius: 8px;
+  box-shadow: 0 18px 50px rgba(0,0,0,0.34), inset 0 0 0 1px rgba(255,255,255,0.04);
+  color: var(--text);
+  text-decoration: none;
+  font-weight: 500;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.2s;
+}
+.eng-cta-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+  background: var(--accent);
+}
+.eng-cta-btn:hover {
+  color: var(--bg) !important;
+  background: var(--accent) !important;
+  border-color: var(--accent) !important;
+  transform: translateY(-2px);
+  text-decoration: none;
+}
+.eng-cta-btn:hover::before { background: var(--bg); }
+
+.eng-links {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.eng-link {
+  display: grid;
+  grid-template-columns: 96px 1fr 34px;
+  align-items: center;
+  padding: 18px 20px;
+  border: 2px solid rgba(185,227,106,0.24);
+  border-radius: 8px;
+  background: rgba(0,0,0,0.20);
+  text-decoration: none;
+  transition: all 0.2s;
+  gap: 18px;
+}
+
+.eng-link:hover {
+  background: rgba(185,227,106,0.06);
+  border-color: rgba(185,227,106,0.72);
+  transform: translateY(-1px);
+  text-decoration: none;
+}
+
+.el-label {
+  font-size: 10px;
+  color: var(--accent);
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.el-val {
+  font-size: 16px;
+  color: var(--text);
+  font-weight: 650;
+  overflow-wrap: anywhere;
+}
+
+.el-arrow {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  justify-self: end;
+  color: var(--action);
+  border: 1px solid rgba(118,161,255,0.38);
+  background: rgba(118,161,255,0.08);
+  border-radius: 6px;
+  font-size: 12px;
+}
+
+/* FOOTER */
+.doc-footer {
+  padding: 32px 24px;
+  border-top: 1px solid var(--border);
+  font-size: 11px;
+  color: var(--muted);
+  display: flex;
+  justify-content: space-between;
+  letter-spacing: 0.04em;
+  max-width: 900px;
+  margin: 0 auto;
+  background: var(--bg);
+}
+
+@media (max-width: 760px) {
+  .eng-cta { grid-template-columns: 1fr; gap: 32px; }
+}
+
+@media (max-width: 600px) {
+  .page { padding: 32px 16px 48px; }
+  .phase-header { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .bug { grid-template-columns: 1fr; gap: 6px; }
+  .bug-index { display: none; }
+  .doc-nav { padding: 0 16px; }
+  .doc-footer { flex-direction: column; gap: 8px; text-align: center; }
+}
+</style>
+</head>
+<body>
+
+<nav class="doc-nav">
+  <div class="nav-id">Raymond Fenton <span class="sub">— Architecture Log</span></div>
+  <div class="nav-links">
+    <a href="https://blueskygtm.github.io/ai-gtm-enrichment-pipeline/">← Pipeline</a>
+    <a href="https://github.com/BlueSkyGTM/ai-gtm-enrichment-pipeline">Repo</a>
+  </div>
+</nav>
+
+<main class="page">
+
+  <header class="doc-header">
+    <div class="doc-eyebrow">Architecture Log</div>
+    <h1 class="doc-title">Failure Mode <em>Resolution.</em></h1>
+    <p class="doc-subtitle">18 fixes across LLM orchestration, data serialization, and state management. Documented in resolution order.</p>
+  </header>
+
+  <div class="thesis">
+    <p><strong>LLMs are probabilistic. Databases are deterministic.</strong> The engineering challenge wasn't generating text—it was forcing reliable, structured output from generative models so hallucinations and drift didn't corrupt Postgres or break the CRM handoff.</p>
+    <p>Prompt-only enforcement is insufficient. Every directive needs a deterministic server-side guard. Every model output needs normalization before it touches the database. Every state transition needs protection against race conditions and rollback.</p>
+  </div>
+
+  <!-- PHASE 1 -->
+  <div class="section-head">
+    <div class="section-label">Phase 1</div>
+    <div class="section-title">LLM Orchestration & <em>Output Governance</em></div>
+  </div>
+
+  <div class="phase">
+    <div class="phase-header">
+      <div class="phase-group">
+        <span class="phase-tag governance">Governance</span>
+        <span class="phase-name">Prompt Contracts, Schema Enforcement, Persona Leakage</span>
+      </div>
+      <span class="phase-count">5 fixes</span>
+    </div>
+
+    <div class="bug">
+      <span class="bug-index">01</span>
+      <div class="bug-content">
+        <div class="bug-title">Nemo Had No Typed Output Contract (The Drift Problem)</div>
+        <p class="bug-failure">NEMO_SYSTEM said "produce a Clay-ready structured output" but never defined the structure. Model inferred key names each run, causing drift (Contact_Recon vs contact_recon, missing Enriched_Lead wrapper, etc.).</p>
+        <div class="bug-fix">Added typed OUTPUT CONTRACT JSON skeleton as final block in NEMO_SYSTEM prompt.</div>
+      </div>
+    </div>
+
+    <div class="bug">
+      <span class="bug-index">02</span>
+      <div class="bug-content">
+        <div class="bug-title">VOICE_CONSTRAINT Was Prohibition-Only</div>
+        <p class="bug-failure">Original directive said "never imply" consultant language—too soft; model still slipped into "founders I work with," "clients I advise," "my research focuses on."</p>
+        <div class="bug-fix">Added explicit NEVER list plus positive identity anchor: "Write in the voice of someone who spent 200 hours studying GTM failure patterns."</div>
+      </div>
+    </div>
+
+    <div class="bug">
+      <span class="bug-index">03</span>
+      <div class="bug-content">
+        <div class="bug-title">Neptune Discarded Its Own Schema-Enforced Funding Signal</div>
+        <p class="bug-failure">Handler called extractFundingSignal(input)—re-reading from raw Nemo payload—even though Neptune's responseSchema now produces result.funding_signal directly. Neptune's assessed judgment was being ignored.</p>
+        <div class="bug-fix">Changed to result.funding_signal ?? extractFundingSignal(input).</div>
+      </div>
+    </div>
+
+    <div class="bug">
+      <span class="bug-index">04</span>
+      <div class="bug-content">
+        <div class="bug-title">Neptune ResponseSchema Missing Funding_Signal Field</div>
+        <p class="bug-failure">Schema enforced Neptune_Log and Outreach_Bite but not funding_signal. Field absent from output on every run.</p>
+        <div class="bug-fix">Added funding_signal: { type: 'string', nullable: true } to properties and required array.</div>
+      </div>
+    </div>
+
+    <div class="bug">
+      <span class="bug-index">05</span>
+      <div class="bug-content">
+        <div class="bug-title">Missing Blank Line Between [The Divers] And [Core_Directives] In NEMO_SYSTEM</div>
+        <p class="bug-failure">Every other section boundary had a blank line separator; this one did not. Risk of model blending the two sections during tokenization.</p>
+        <div class="bug-fix">Added blank line separator.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE 2 -->
+  <div class="section-head">
+    <div class="section-label">Phase 2</div>
+    <div class="section-title">Data Serialization & <em>State Management</em></div>
+  </div>
+
+  <div class="phase">
+    <div class="phase-header">
+      <div class="phase-group">
+        <span class="phase-tag state">State</span>
+        <span class="phase-name">Database Integrity, Race Conditions, JSONB Serialization</span>
+      </div>
+      <span class="phase-count">6 fixes</span>
+    </div>
+
+    <div class="bug">
+      <span class="bug-index">06</span>
+      <div class="bug-content">
+        <div class="bug-title">ON CONFLICT Reset Enriched And Finished Leads To Scraped</div>
+        <p class="bug-failure">Nightly Ahab re-run on a previously completed lead reset status = 'Scraped' unconditionally, re-queuing it through Nemo and Neptune.</p>
+        <div class="bug-fix">Added WHERE gtm_career_leads.status = 'Scraped' to the DO UPDATE clause.</div>
+      </div>
+    </div>
+
+    <div class="bug">
+      <span class="bug-index">07</span>
+      <div class="bug-content">
+        <div class="bug-title">Contact_Recon Stored Inconsistently Between Nemo And Neptune</div>
+        <p class="bug-failure">Nemo wrote a raw JS object (pg serializes to JSONB); Neptune wrote JSON.stringify(contactRaw)—a string literal inside a JSONB column, breaking contact_recon->>'email' queries.</p>
+        <div class="bug-fix">Removed JSON.stringify from normalizeNemoPayload; both stages now pass raw object.</div>
+      </div>
+    </div>
+
+    <div class="bug">
+      <span class="bug-index">08</span>
+      <div class="bug-content">
+        <div class="bug-title">SHIPWRECKED Leads Briefly Showed As Enriched</div>
+        <p class="bug-failure">SHIPWRECKED check fired after the status='Enriched' UPDATE, creating a race window where a dead lead appeared alive.</p>
+        <div class="bug-fix">Moved SHIPWRECKED check before the first UPDATE. Branch now writes status='Shipwrecked' and nemo_payload in a single query before inserting fleet_errors.</div>
+      </div>
+    </div>
+
+    <div class="bug">
+      <span class="bug-index">09</span>
+      <div class="bug-content">
+        <div class="bug-title">Funding_Signal Always Null In Postgres</div>
+        <p class="bug-failure">Neptune read lead.funding_signal where lead = input.Enriched_Lead || input, but Nemo never placed funding_signal at that path.</p>
+        <div class="bug-fix">Added extractFundingSignal() with priority-ordered path search and prose regex fallback against health_audit_notes.</div>
+      </div>
+    </div>
+
+    <div class="bug">
+      <span class="bug-index">10</span>
+      <div class="bug-content">
+        <div class="bug-title">Nemo Never Wrote Funding_Signal To Its Dedicated Column</div>
+        <p class="bug-failure">funding_signal was buried inside nemo_payload JSONB, never surfacing in the dedicated column.</p>
+        <div class="bug-fix">Added funding_signal = COALESCE($8, funding_signal) to Nemo's UPDATE, reading from result?.Enriched_Lead?.funding_signal.</div>
+      </div>
+    </div>
+
+    <div class="bug">
+      <span class="bug-index">11</span>
+      <div class="bug-content">
+        <div class="bug-title">Neptune Null Guard Fired After NormalizeNemoPayload</div>
+        <p class="bug-failure">normalizeNemoPayload(nemo_payload) ran before the if (!nemo_payload) guard, meaning a null payload was processed before being rejected.</p>
+        <div class="bug-fix">Moved null check above the normalizer call.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE 3 -->
+  <div class="section-head">
+    <div class="section-label">Phase 3</div>
+    <div class="section-title">Edge Cases & <em>Dead Code</em></div>
+  </div>
+
+  <div class="phase">
+    <div class="phase-header">
+      <div class="phase-group">
+        <span class="phase-tag edge">Edge</span>
+        <span class="phase-name">Invisible Failures, Filtering Leaks, Undefined References</span>
+      </div>
+      <span class="phase-count">7 fixes</span>
+    </div>
+
+    <div class="bug">
+      <span class="bug-index">12</span>
+      <div class="bug-content">
+        <div class="bug-title">Ahab Returning Job Board Aggregators As Company_Name</div>
+        <p class="bug-failure">Ahab returned Jobgether, Jobsora, etc. as valid companies, creating lead_unknown_company__via_jobgether_ rows.</p>
+        <div class="bug-fix">Added COMPANY_FILTER as directive 7 in AHAB_SYSTEM prompt.</div>
+      </div>
+    </div>
+
+    <div class="bug">
+      <span class="bug-index">13</span>
+      <div class="bug-content">
+        <div class="bug-title">Aggregator Filter Not Enforced Server-Side</div>
+        <p class="bug-failure">Prompt-only enforcement is probabilistic; aggregators still slipped through.</p>
+        <div class="bug-fix">Added AGGREGATORS Set and pre-INSERT guard in Ahab handler; leads returning null filtered from session_ids via .filter(Boolean).</div>
+      </div>
+    </div>
+
+    <div class="bug">
+      <span class="bug-index">14</span>
+      <div class="bug-content">
+        <div class="bug-title">Neptune Failures Invisible In Fleet_Errors</div>
+        <p class="bug-failure">Neptune catch returned 500 only; stalled leads showed as Enriched with no diagnostic entry.</p>
+        <div class="bug-fix">Added NEPTUNE_FAILURE insert into fleet_errors in Neptune's catch block.</div>
+      </div>
+    </div>
+
+    <div class="bug">
+      <span class="bug-index">15</span>
+      <div class="bug-content">
+        <div class="bug-title">Nemo Failures Invisible In Fleet_Errors</div>
+        <p class="bug-failure">Nemo catch returned 500 only; failed leads stuck at Scraped indefinitely with no diagnostic entry.</p>
+        <div class="bug-fix">Added NEMO_FAILURE insert into fleet_errors in Nemo's catch block.</div>
+      </div>
+    </div>
+
+    <div class="bug">
+      <span class="bug-index">16</span>
+      <div class="bug-content">
+        <div class="bug-title">ParsedInput.Session_ID Dead Code In Nemo Handler</div>
+        <p class="bug-failure">parsedInput is the Ahab payload—it never contains session_id. First operand of parsedInput.session_id || input_session_id || null was always undefined.</p>
+        <div class="bug-fix">Removed; replaced with const session_id = input_session_id || null.</div>
+      </div>
+    </div>
+
+    <div class="bug">
+      <span class="bug-index">17</span>
+      <div class="bug-content">
+        <div class="bug-title">Input.Session_ID Dead Code In Neptune Handler</div>
+        <p class="bug-failure">Same pattern: input is parsed from nemo_payload, which has no session_id field per the OUTPUT CONTRACT.</p>
+        <div class="bug-fix">Removed; replaced with const session_id = input_session_id || null.</div>
+      </div>
+    </div>
+
+    <div class="bug">
+      <span class="bug-index">18</span>
+      <div class="bug-content">
+        <div class="bug-title">Missing Blank Line In Tokenization</div>
+        <p class="bug-failure">Covered in fix #5 above.</p>
+        <div class="bug-fix">Resolved by blank line separator addition in Phase 1.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ARCHITECTURE DECISIONS -->
+  <div class="section-head" style="margin-top: 64px;">
+    <div class="section-label">Constraints</div>
+    <div class="section-title">Architecture <em>Decisions</em></div>
+  </div>
+
+  <div class="decisions">
+    <div class="decision">
+      <div class="decision-title">Nemo: Google Search Grounding ≠ Response Schema</div>
+      <div class="decision-body">Gemini does not support <strong>responseSchema</strong> and <strong>tools: [{ googleSearch: {} }]</strong> simultaneously. Nemo's output contract is enforced via the in-prompt OUTPUT CONTRACT skeleton only, not via schema. Adding responseSchema to Nemo will break grounding.</div>
+    </div>
+    <div class="decision">
+      <div class="decision-title">ON CONFLICT Protects Finished / Enriched Rows</div>
+      <div class="decision-body">The <strong>DO UPDATE</strong> clause on Ahab's INSERT only fires when the existing row is still at <strong>Scraped</strong>. This prevents nightly re-runs from resetting leads that have already been enriched or synthesized. Removing this guard re-introduces the reset bug.</div>
+    </div>
+    <div class="decision">
+      <div class="decision-title">Contact_Recon Writes As Raw Object — No JSON.Stringify</div>
+      <div class="decision-body">Both Nemo and Neptune pass <strong>Contact_Recon</strong> as a raw JS object to pg. The pg driver serializes it correctly for the JSONB column. Wrapping in <strong>JSON.stringify</strong> stores a string literal inside JSONB, which breaks all <strong>-></strong> and <strong>->></strong> operator queries downstream.</div>
+    </div>
+    <div class="decision">
+      <div class="decision-title">Session_ID Is Always Input_Session_ID</div>
+      <div class="decision-body">Neither the Ahab payload (parsed in Nemo) nor the Nemo payload (parsed in Neptune) contains a <strong>session_id</strong> field. The only valid source is <strong>input_session_id</strong> from the request body. Reading payload.session_id as a first operand is always undefined.</div>
+    </div>
+  </div>
+
+  <!-- KNOWN GAPS -->
+  <div class="section-head">
+    <div class="section-label">Pending</div>
+    <div class="section-title">Known <em>Gaps</em></div>
+  </div>
+
+  <div class="gaps">
+    <div class="gap"><strong>Fetch Timeout On Gemini Calls.</strong> callGenerateContent has no timeout. A hung gemini-2.5-pro request blocks the n8n node indefinitely, stalling all downstream leads in that batch. Fix: pass signal: AbortSignal.timeout(90_000) to the fetch call inside callGenerateContent.</div>
+    <div class="gap"><strong>Funding_Signal Write Verification.</strong> The COALESCE write is implemented in code (funding_signal = COALESCE($8, funding_signal)), but has not been confirmed against live production runs. Verify that result?.Enriched_Lead?.funding_signal is populated by Nemo in practice now that the OUTPUT CONTRACT is in place.</div>
+    <div class="gap"><strong>Typed Contract Simplification.</strong> normalizeNemoPayload and extractFrictionType carry multi-path fallback logic built before the Nemo OUTPUT CONTRACT existed. With the contract stable in production, the fallback chains can be pruned to the primary path only.</div>
+  </div>
+
+  <!-- CTA SECTION -->
+  <div class="eng-cta">
+    <div>
+      <h2 class="eng-cta-title">Need An Engineer Who <em>Debugs The AI Layer?</em></h2>
+      <p class="eng-cta-sub">
+        Most people can prompt an LLM. Very few can govern its output, fix the serialization errors, and keep the CRM handoff clean when the model drifts. If your team needs that layer built, let's talk.
+      </p>
+      <a class="eng-cta-btn" href="mailto:raymondf.gtm@gmail.com">Get In Touch →</a>
+    </div>
+    <div class="eng-links">
+      <a class="eng-link" href="mailto:raymondf.gtm@gmail.com">
+        <span class="el-label">Email</span>
+        <span class="el-val">raymondf.gtm@gmail.com</span>
+        <span class="el-arrow">→</span>
+      </a>
+      <a class="eng-link" href="https://www.linkedin.com/in/raymond-fenton-51b01b160/">
+        <span class="el-label">LinkedIn</span>
+        <span class="el-val">Raymond Fenton</span>
+        <span class="el-arrow">→</span>
+      </a>
+      <a class="eng-link" href="https://github.com/BlueSkyGTM/ai-gtm-enrichment-pipeline">
+        <span class="el-label">Repo</span>
+        <span class="el-val">ai-gtm-enrichment-pipeline</span>
+        <span class="el-arrow">→</span>
+      </a>
+    </div>
+  </div>
+
+</main>
+
+<!-- FOOTER -->
+<footer class="doc-footer">
+  <span>© 2025 Raymond Fenton · Architecture Log</span>
+  <span>Built without venture capital.</span>
+</footer>
+
+</body>
+</html>
