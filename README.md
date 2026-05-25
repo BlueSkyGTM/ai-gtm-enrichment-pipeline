@@ -1,56 +1,54 @@
-# TL;DR
+# AI GTM Enrichment Pipeline
 
-A technical reconstruction of Clay-style GTM enrichment logic, built on a shoestring budget to understand how AI-assisted enrichment systems manage discovery, structured context, staged handoffs, failure states, and final payload generation.
+An AI GTM enrichment system that turns public market signals into governed, CRM-ready payloads through staged agents, structured QA, and clean handoff contracts.
 
-This repository is not a production outbound platform. It is an architecture record: what had to exist for a Clay-like enrichment workflow to survive real row-level ambiguity, model drift, n8n payload limits, job-board noise, contact/research handoff failures, and schema instability.
+The architecture focuses on the operational layer where AI strategy becomes useful GTM execution: source discovery, diagnostic enrichment, model-output governance, failure visibility, and final payload design for Clay, HubSpot, or downstream revenue workflows.
 
 ## Core Thesis
 
-Generic enrichment answers are cheap. Durable enrichment is harder.
+Generic enrichment answers are cheap. Durable enrichment requires stage contracts.
 
-The important idea this project uncovered is that enrichment quality improves when the table becomes a shared context surface. Each stage writes a small, durable payload that later stages can inherit instead of starting over from raw context.
-
-In other words:
+This system demonstrates that enrichment quality improves when the workflow becomes a shared context surface. Each stage writes a small, durable payload that later stages can inherit instead of restarting from raw web context.
 
 ```text
 Clay columns are not just lookups.
 They can be memory-bearing handoffs.
 ```
 
-The server-era system used Postgres for that shared context surface. Clay can use the table itself.
+The server architecture used Postgres for that shared context surface. A Clay-native version can use the table itself.
 
-## What This Project Proved
+## What The System Demonstrates
 
-The original system used Google Cloud, n8n, Postgres, and Gemini as a runtime lab. That runtime is no longer the product. It was the test bench that made the important design patterns visible:
+The pipeline used Google Cloud, n8n, Postgres, and Gemini as a runtime stack to validate the design patterns behind reliable AI-assisted enrichment:
 
-- A lead workflow needs stage contracts, not one giant prompt.
-- A workflow tool should not carry heavy AI payloads between every step.
-- Grounded search is useful for discovery, but it needs filters that protect against job-board aggregators.
-- AI output needs strict contracts, fallback behavior, and failure visibility.
-- Later enrichments are more useful when they inherit the last stage's structured judgment.
-- The final value is not "send outbound." The value is a trustworthy GTM payload that can move into Clay, HubSpot, or a sequencing tool with clean state.
+- Lead workflows need stage contracts, not one giant prompt.
+- Workflow tools should pass stable identifiers instead of heavy AI payloads.
+- Grounded search is useful for discovery when strict filters protect against job-board noise.
+- AI output needs contracts, fallback behavior, parser recovery, and failure visibility.
+- Later enrichments are more useful when they inherit structured judgment from earlier stages.
+- The final value is a trustworthy GTM payload that can move into Clay, HubSpot, or a sequencing tool with clean state.
 
 ## System Overview
 
-The server-era pipeline had three stages:
+The pipeline has three core stages:
 
 ```text
 Discovery -> Diagnostic Enrichment -> Final Payload
 ```
 
-The infrastructure around those stages was:
+The infrastructure around those stages:
 
 ```text
 Cloud Scheduler -> n8n -> fleet-agents API -> Postgres -> Retool
 ```
 
-n8n was intentionally reduced to traffic control. It triggered the workflow and passed stable identifiers. The server and database handled the actual enrichment state.
+n8n acts as traffic control. It triggers the workflow and passes stable identifiers. The server and database handle enrichment state, model output, parser recovery, and inspection.
 
 ## Core Architecture Decision: Pull Model
 
-The first version pushed full payloads through n8n. That failed because every node carried too much context: source URLs, company notes, research strings, model logs, contacts, health signals, and partial output fields. Payloads grew, expressions broke, and downstream model calls received polluted context.
+The first version pushed full payloads through n8n. That design created brittle handoffs because every node carried too much context: source URLs, company notes, research strings, model logs, contacts, health signals, and partial output fields. Payloads grew, expressions broke, and downstream model calls received polluted context.
 
-The fix was a pull model:
+The system moved to a pull model:
 
 ```text
 Discovery writes payload to Postgres
@@ -64,9 +62,9 @@ This reduced handoffs to a stable key and made every stage independently inspect
 
 ## Discovery: Search Filtering
 
-The discovery stage found companies with active GTM, RevOps, MarOps, or automation signals.
+The discovery stage finds companies with active GTM, RevOps, MarOps, automation, or AI workflow signals.
 
-Important behaviors:
+Key behaviors:
 
 - Used Gemini with Google Search grounding to reach live web evidence.
 - Searched from role and campaign instructions rather than a static lead list.
@@ -75,7 +73,7 @@ Important behaviors:
 - Generated deterministic `session_id` values from company names.
 - Wrote one row per company to Postgres with `status = 'Scraped'`.
 
-The useful insight is not that this was a crawler. It was not. The insight is that grounded search plus strict company filtering can turn noisy public hiring surfaces into structured GTM inputs.
+Grounded search plus strict company filtering turns noisy public hiring surfaces into structured GTM inputs.
 
 Relevant files:
 
@@ -85,9 +83,7 @@ Relevant files:
 
 ## Diagnostic Enrichment
 
-The enrichment stage read a stored discovery payload and produced a structured enrichment object.
-
-The important work was forensic, not generic enrichment. It classified operational friction into reusable categories:
+The enrichment stage reads a stored discovery payload and produces a structured enrichment object. The work is diagnostic, not generic enrichment: the system classifies operational friction into reusable categories.
 
 | Friction type | Meaning |
 |---------------|---------|
@@ -96,7 +92,7 @@ The important work was forensic, not generic enrichment. It classified operation
 | `Manual Data Debt` | Humans are doing work that should be automated |
 | `Displacement Signal` | A company is paying for a tool or role that points to a better system-level fix |
 
-It also handled disqualification. If a funding or growth signal was stale, the row could be marked `Shipwrecked` instead of being pushed forward as a false positive.
+It also handles disqualification. If a funding or growth signal is stale, the row can be marked `Shipwrecked` instead of being pushed forward as a false positive.
 
 Relevant files:
 
@@ -105,11 +101,11 @@ Relevant files:
 - `system_files/src/utils/parser.js`
 - `system_files/src/utils/parser.py`
 
-## Parser Layer: Why It Mattered
+## Parser Layer
 
-The parser layer was the practical bridge between n8n, model output, and server code.
+The parser layer is the practical bridge between n8n, model output, and server code.
 
-`parser.py` normalized n8n payloads into a smaller shape the server could reliably process:
+`parser.py` normalizes n8n payloads into a smaller shape the server can reliably process:
 
 ```json
 {
@@ -120,27 +116,21 @@ The parser layer was the practical bridge between n8n, model output, and server 
 }
 ```
 
-`parser.js` handled runtime cleanup:
+`parser.js` handles runtime cleanup:
 
-- Stripped citation markers such as `[1]` and `[2, 3]`.
-- Rejected Vertex AI grounding redirect URLs.
-- Extracted valid JSON from markdown-wrapped model output.
-- Located friction and funding signals across inconsistent model output paths.
-- Normalized contact payloads without corrupting JSONB.
+- Strips citation markers such as `[1]` and `[2, 3]`.
+- Rejects Vertex AI grounding redirect URLs.
+- Extracts valid JSON from markdown-wrapped model output.
+- Locates friction and funding signals across inconsistent model output paths.
+- Normalizes contact payloads without corrupting JSONB.
 
-The parser layer is why the experiment became useful: it exposed the gap between "the model produced something" and "the workflow can safely use it."
+The parser layer exposes the real production gap between "the model produced something" and "the workflow can safely use it."
 
 ## Final Payload Synthesis
 
-The final render stage read the enriched record and produced the final handoff payload.
+The final render stage reads the enriched record and produces the handoff payload.
 
-The important lesson was not copywriting automation. Clay is not the outbound tool, and this repo should not be read as "Clay sends cold email." The useful pattern is that a final render stage should receive a narrow, validated brief rather than the full research context.
-
-This stage tested:
-
-- Whether a compact structured payload could generate specific human-facing language.
-- Whether funding, friction type, contact context, and service intent were enough to produce a useful next-step payload.
-- Whether schema-like output contracts reduced drift.
+The useful pattern is that a final render stage should receive a narrow, validated brief rather than the full research context. This stage validates whether funding, friction type, contact context, and service intent are enough to produce specific human-facing language and a CRM-ready next-step payload.
 
 Relevant files:
 
@@ -152,7 +142,7 @@ Relevant files:
 
 The stage-contract document is the spine of the project. It defines what each stage must receive, what it must produce, and what the next stage can assume.
 
-This matters because agent workflows fail when every step receives "everything." Stage contracts force each stage to expose only the fields downstream work needs.
+Agent workflows fail when every step receives "everything." Stage contracts force each stage to expose only the fields downstream work needs.
 
 Key contract ideas:
 
@@ -167,7 +157,7 @@ Relevant file:
 
 ## n8n's Role
 
-n8n was deliberately not the intelligence layer.
+n8n is deliberately not the intelligence layer.
 
 Its job:
 
@@ -183,16 +173,16 @@ Its non-job:
 - Hold business logic.
 - Decide enrichment strategy.
 
-That division is what made the later Clay-native idea possible. If n8n can be reduced to handoffs, Clay columns can become the handoffs.
+That division keeps orchestration separate from enrichment intelligence. If n8n can be reduced to handoffs, Clay columns can become the handoffs.
 
 Relevant files:
 
 - `n8n_pipelines/WORKFLOW_BUILDER.md`
 - `n8n_pipelines/WORKFLOW_USAGE.md`
 
-## Failure Modes That Shaped the System
+## Failure Modes Resolved
 
-The project is useful because failures were documented, not hidden.
+The system is useful because failures were documented and designed around.
 
 Important fixes included:
 
@@ -209,11 +199,11 @@ Relevant file:
 
 - `system_files/CHANGELOG.md`
 
-## Why This Points Back To Clay
+## Clay-Native Translation
 
-The server proved the contracts. Clay is the natural operating surface.
+The server stack validated the contracts. Clay is the natural operating surface for a GTM team that wants the same logic inside a table.
 
-The future version does not need Cloud Run, Postgres, or n8n as the center. It needs:
+The Clay-native design uses:
 
 - Clay tables with stable identifiers.
 - One job per AI column.
@@ -229,26 +219,27 @@ That design is documented in:
 
 ## Reviewer Path
 
-If you are reviewing this project for a RevOps, MarOps, GTM Ops, or Automation role, read in this order:
+If you are reviewing this project for a GTM Engineering, RevOps, MarOps, Marketing Automation, or AI Workflow Strategy role, read in this order:
 
 1. `README.md` -- architecture story and why it matters.
 2. `agent_framework/agents/stage_contracts.md` -- input/output contracts.
 3. `system_files/src/utils/parser.py` -- n8n-to-server normalization.
 4. `system_files/src/utils/parser.js` -- cleanup and extraction layer.
 5. `system_files/src/agents/ahab.js` -- grounded discovery and aggregator filtering.
-6. `system_files/src/agents/nemo.js` -- enrichment stage.
+6. `system_files/src/agents/nemo.js` -- diagnostic enrichment stage.
 7. `system_files/src/agents/neptune.js` -- final synthesis stage.
-8. `CLAY_PLAYBOOK.md` -- future Clay-native translation.
+8. `CLAY_PLAYBOOK.md` -- Clay-native translation.
 
 ## Role Fit
 
-This project is relevant to entry/junior:
+This project is relevant to:
 
-- RevOps
-- MarOps
-- Marketing Automation
-- GTM Ops
-- Clay operator / Clay builder
-- Automation Specialist
+- GTM Engineering
+- RevOps and Marketing Operations
+- AI Workflow Architecture
+- Automation Strategy
+- CRM Operations
+- Clay builder / enrichment systems roles
+- Data-driven growth operations
 
-It is not positioned as a software engineering portfolio first. The code exists to prove systems thinking: clean handoffs, CRM-ready payloads, enrichment discipline, context control, and operational QA.
+The code exists to prove systems thinking in the operating layer: clean handoffs, CRM-ready payloads, enrichment discipline, context control, model-output QA, and failure visibility.

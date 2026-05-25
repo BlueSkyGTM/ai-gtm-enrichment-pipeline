@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Raymond Fenton — RevOps · MarOps · Clay Systems</title>
+<title>Raymond Fenton — AI GTM Enrichment Pipeline</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -391,28 +391,16 @@ button:focus-visible,
 
 .term-head {
   display: grid;
-  /* Fixed allocations for signals, flexible locked fractions for your long text content */
-  grid-template-columns: 110px 110px 100px 80px minmax(0, 1.2fr) minmax(0, 1.5fr);
-  padding: 10px 16px;
-  background: #111111;
-  border-bottom: 1px solid var(--border2);
-  color: var(--muted);
-  font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
-.tr-row {
-  display: grid;
-  /* MUST TRACK THE EXACT SAME RATIO AS THE HEADER ABOVE */
-  grid-template-columns: 110px 110px 100px 80px minmax(0, 1.2fr) minmax(0, 1.5fr);
-  padding: 0;
+  grid-template-columns: var(--lead-grid);
+  min-width: 1340px;
+  gap: 16px;
+  padding: 11px 24px;
   border-bottom: 1px solid var(--border);
-  cursor: pointer;
-  transition: background 0.12s ease;
-  align-items: stretch;
+  background: var(--surface);
+  position: sticky;
+  top: 0;
+  z-index: 3;
 }
-
 .term-head span {
   display: block;
   font-family: 'DM Sans', sans-serif;
@@ -422,6 +410,17 @@ button:focus-visible,
   font-weight: 600;
 }
 
+.term-row {
+  display: grid;
+  grid-template-columns: var(--lead-grid);
+  min-width: 1340px;
+  gap: 16px;
+  padding: 18px 24px;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  transition: background .2s;
+  align-items: start;
+}
 .term-row:hover { background: rgba(118,161,255,0.07); }
 .term-row.on {
   background: var(--action-soft);
@@ -465,57 +464,26 @@ button:focus-visible,
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-
 .tr-bite-cell {
-  padding: 12px 16px;
-  color: inherit;               
-  font-size: 11.5px;
-  font-family: monospace;
-  line-height: 1.5;             
-  display: block;               
-  white-space: normal !important; 
-  word-break: break-word;       
-  
-  /* The Track Lock Constraints */
-  min-width: 0 !important;      
-  max-height: 90px;             
-  overflow: hidden;             
-
-  -webkit-mask-image: linear-gradient(180deg, #000 60%, transparent 98%);
-  mask-image: linear-gradient(180deg, #000 60%, transparent 98%);
-}
-
-.tr-email-cell {
-  padding: 12px 16px;
-  color: inherit;               
-  font-size: 11.5px;
-  font-family: monospace;
-  line-height: 1.5;             
-  display: block;               
-  white-space: normal !important; 
-  word-break: break-word;       
-  
-  /* The Track Lock Constraints */
-  min-width: 0 !important;      
-  max-height: 90px;             
-  overflow: hidden;             
-
-  -webkit-mask-image: linear-gradient(180deg, #000 60%, transparent 98%);
-  mask-image: linear-gradient(180deg, #000 60%, transparent 98%);
-}
-
-  /* Hard Multi-Line Word Boundary Clamping */
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--text);
   display: -webkit-box;
-  -webkit-line-clamp: 5;        /* Strictly clamps text at line 5 */
+  -webkit-line-clamp: 4;
   -webkit-box-orient: vertical;
-  overflow: hidden;             /* Completely hides any characters past the line limit */
-  text-overflow: ellipsis;      /* Correctly forces '...' right at the boundary */
-  white-space: normal !important; /* Overrides any global white-space inherits to force wrapping */
-  word-break: break-word;       /* Breaks layout at words natively */
-  
-  /* The Absolute Track Lock Constraints */
-  max-width: 100% !important;   /* Forces sentence strings to treat the track grid wall as a hard stop */
-  box-sizing: border-box !important;
+  overflow: hidden;
+}
+.tr-email-cell {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--text);
+  white-space: pre-line;
+  display: -webkit-box;
+  -webkit-line-clamp: 5;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 .term-row.on .tr-bite-cell,
 .term-row.on .tr-email-cell { color: var(--text); }
@@ -931,6 +899,17 @@ button:focus-visible,
   top: 0;
   bottom: 0;
   border-left: 1px solid rgba(118,161,255,0.42);
+}
+.wf-transfer::after {
+  content: '';
+  position: absolute;
+  left: calc(50% - 3px);
+  bottom: -1px;
+  width: 7px;
+  height: 7px;
+  border-right: 1px solid rgba(118,161,255,0.7);
+  border-bottom: 1px solid rgba(118,161,255,0.7);
+  transform: rotate(45deg);
 }
 .wf-chip {
   position: relative;
@@ -2768,22 +2747,16 @@ footer {
   background: var(--surface) !important;
 }
 .term-head {
-  display: grid;
-  grid-template-columns: var(--lead-grid);
-  border-bottom: 1px solid var(--border);
-  background: #0d0d0d;
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  align-items: stretch; /* Synchronizes the header height layout */
+  position: sticky !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: max-content !important;
+  background: #101010 !important;
+  z-index: 4 !important;
 }
-.term-row {
-  display: grid;
-  grid-template-columns: var(--lead-grid);
-  border-bottom: 1px solid var(--border);
-  transition: background 0.12s ease;
-  align-items: stretch; /* Forces all role columns to expand together vertically */
-  height: auto;
+#term-rows {
+  width: max-content !important;
+  min-width: 100% !important;
 }
 .term-detail {
   position: relative !important;
@@ -2992,15 +2965,7 @@ footer {
   border: 2px solid rgba(185,227,106,0.24) !important;
 }
 .wf-detail {
-  /* Frame all sides cleanly */
-  border: 1px solid rgba(185, 227, 106, 0.34) !important;
-  /* Keep the left border slightly darker to match the grid divider precisely */
-  border-left: 1px solid rgba(185, 227, 106, 0.42) !important;
-
-  /* Structural lighting glow and baseline padding */
-  box-shadow: inset 1px 1px 0 rgba(118, 161, 255, 0.10) !important;
-  padding: 24px !important;
-  background: var(--surface) !important;
+  border-left: 2px solid rgba(185,227,106,0.24) !important;
 }
 /* Operator + Plumbing Final Polish */
 .contact {
@@ -3026,22 +2991,20 @@ footer {
   color: var(--text) !important;
   max-width: 620px !important;
 }
-.contact-links-container {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+.contact-links {
+  gap: 14px !important;
+  padding: 18px !important;
+  background: linear-gradient(180deg, rgba(255,255,255,0.035), rgba(255,255,255,0.012)) !important;
+  border: 1px solid rgba(185,227,106,0.42) !important;
+  box-shadow: 0 40px 120px rgba(0,0,0,0.30), 0 0 0 1px rgba(185,227,106,0.08) !important;
 }
 .contact-link {
-  display: grid;
   grid-template-columns: 96px 1fr 34px !important;
   min-height: 76px !important;
   padding: 18px 20px !important;
-  border: 1px solid rgba(185,227,106,0.35) !important;
+  border: 2px solid rgba(185,227,106,0.24) !important;
   background: rgba(0,0,0,0.20) !important;
   gap: 18px !important;
-  border-radius: 8px !important;
-  margin-bottom: 0 !important;
-  text-decoration: none;
 }
 .contact-link:hover {
   background: rgba(185,227,106,0.06) !important;
@@ -3332,27 +3295,20 @@ footer {
 .dictionary-btn {
   border-radius: 7px !important;
 }
-/* ==========================================
-   REMOVE GRAPH NODE CONNECTOR PORT DOTS
-   ========================================== */
-.wf-node::before,
-.wf-node.seed::before {
-  display: none !important;
-}
 </style>
 </head>
 <body>
 
 <!-- NAV -->
 <nav>
-  <div class="nav-id">Raymond Fenton <span class="sub">— RevOps · MarOps · Clay Systems</span></div>
+  <div class="nav-id">Raymond Fenton <span class="sub">— GTM Systems · AI Workflow Architecture</span></div>
   <div class="nav-right">
     <ul class="nav-links">
       <li><a href="#output">Payload</a></li>
       <li><a href="#playbook">Playbook</a></li>
       <li><a href="#process">Plumbing</a></li>
       <li><a href="#agents">Prompts</a></li>
-      <li><a href="#contact">Operator</a></li>
+      <li><a href="#contact">Architect</a></li>
     </ul>
     <a href="mailto:raymondf.gtm@gmail.com" class="nav-contact">Get in Touch →</a>
   </div>
@@ -3362,17 +3318,17 @@ footer {
 <section class="hero">
   <div class="hero-grid"></div>
   <div class="hero-inner">
-    <div class="hero-pre reveal">RevOps · MarOps · CRM-Ready Automation</div>
+    <div class="hero-pre reveal">Data-Driven GTM · AI Workflow Architecture · CRM-Ready Automation</div>
     <h1 class="hero-h1 reveal">
-      <span>45-Days Reverse Engineering Clay.</span><br>
-      <em>Building the Enrichment Engine Backwards.</em>
+      <span>AI GTM Enrichment Pipeline.</span><br>
+      <em>From Market Signals to CRM-Ready Payloads.</em>
     </h1>
     <p class="hero-sub reveal">
-      To understand Clay enrichment at the model level, I rebuilt the workflow from scratch on a shoestring budget — then translated the lessons into Clay-style tables, HubSpot-ready payloads, and operational handoff design.
+      I built an agentic enrichment system that turns public hiring, funding, and stack signals into governed GTM payloads - then translated the architecture into Clay-style tables, HubSpot-ready fields, and operational handoff design.
     </p>
     <div class="hero-btns reveal">
       <a href="#output" class="btn-a">Inspect the payload ↓</a>
-      <a href="https://github.com/BlueSkyGTM/reverse-engineering-clay" class="btn-b">View repo →</a>
+      <a href="https://github.com/BlueSkyGTM/ai-gtm-enrichment-pipeline" class="btn-b">View repo →</a>
     </div>
   </div>
 </section>
@@ -3380,16 +3336,16 @@ footer {
 <!-- STAT BAR -->
 <div class="stat-bar reveal">
   <div class="stat-cell">
-    <div class="stat-n">45</div>
-    <div class="stat-d"><b>Days of Testing</b>Hundreds of prompt configs. Every failure documented.</div>
+    <div class="stat-n">3K+</div>
+    <div class="stat-d"><b>Enrichment Cycles</b>Local test runs across discovery, enrichment, and payload generation.</div>
   </div>
   <div class="stat-cell">
     <div class="stat-n">1,500</div>
-    <div class="stat-d"><b>Tested Run Capacity</b>Stress-tested at 1,500 records in an afternoon.</div>
+    <div class="stat-d"><b>Usable Records</b>Noisy outputs filtered into reviewable, structured GTM records.</div>
   </div>
   <div class="stat-cell">
-    <div class="stat-n">$300</div>
-    <div class="stat-d"><b>Total Budget</b>One Google Cloud stipend. One $20 Claude plan.</div>
+    <div class="stat-n">500+</div>
+    <div class="stat-d"><b>Targeted Leads</b>Generated with governed hooks and CRM-ready context.</div>
   </div>
   <div class="stat-cell">
     <div class="stat-n">18</div>
@@ -3410,6 +3366,7 @@ footer {
       <div class="td td-r"></div>
       <div class="td td-y"></div>
       <div class="td td-g"></div>
+      <div class="term-title">GTM Career Leads · Funded Samples · HubSpot-ready review view</div>
     </div>
     <div class="term-body">
       <div class="term-list">
@@ -3510,7 +3467,7 @@ Would you be open to chatting?</div>
   </p>
 
   <div class="flow-wrap reveal">
-    <!-- <div class="flow-caption">Interactive Backend Workflow Map</div> -->
+    <div class="flow-caption">// Interactive Backend Workflow Map</div>
     <div class="flow-stage">
       <div class="workflow-map has-panel" aria-label="Clickable backend enrichment workflow map">
         <div class="wf-grid">
@@ -3691,14 +3648,14 @@ Would you be open to chatting?</div>
 <!-- ══ STAGE 6: OPERATOR ══ -->
 <section class="contact" id="contact">
   <div class="contact-copy reveal">
-    <div class="section-label" data-num="05">The Operator</div>
-    <h2 class="contact-h2 process-h2">Go-To-Market Operator.<br><em>Technical Follow-Through.</em></h2>
+    <div class="section-label" data-num="05">The Architect</div>
+    <h2 class="contact-h2 process-h2">GTM Systems Engineer.<br><em>AI Workflow Architecture.</em></h2>
     <p class="contact-sub">
       I turn messy GTM inputs into structured records, useful handoffs, and workflows that a revenue team can actually inspect, trust, and use.
     </p>
     <a class="contact-cta" href="mailto:raymondf.gtm@gmail.com">Get in Touch →</a>
   </div>
- <div class="contact-links-container reveal">
+  <div class="contact-links reveal">
     <a class="contact-link" href="mailto:raymondf.gtm@gmail.com">
       <span class="cl-label">Email</span>
       <span class="cl-val">raymondf.gtm@gmail.com</span>
@@ -3706,12 +3663,17 @@ Would you be open to chatting?</div>
     </a>
     <a class="contact-link" href="https://www.linkedin.com/in/raymond-fenton-51b01b160/">
       <span class="cl-label">LinkedIn</span>
-      <span class="cl-val">https://www.linkedin.com/in/raymond-fenton-51b01b160/</span>
+      <span class="cl-val">Raymond Fenton</span>
       <span class="cl-arrow">→</span>
     </a>
-    <a class="contact-link" href="https://github.com/BlueSkyGTM/reverse-engineering-clay">
+    <a class="contact-link" href="https://github.com/BlueSkyGTM/ai-gtm-enrichment-pipeline">
       <span class="cl-label">Repo</span>
-      <span class="cl-val">reverse-engineering-clay</span>
+      <span class="cl-val">ai-gtm-enrichment-pipeline</span>
+      <span class="cl-arrow">→</span>
+    </a>
+    <a class="contact-link" href="https://blueskygtm.github.io/ai-gtm-enrichment-pipeline/">
+      <span class="cl-label">Artifact</span>
+      <span class="cl-val">AI GTM Enrichment Pipeline</span>
       <span class="cl-arrow">→</span>
     </a>
   </div>
