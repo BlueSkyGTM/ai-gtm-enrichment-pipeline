@@ -1,6 +1,6 @@
 # Clay Playbook: Agentic Clay Columns
 
-This playbook translates the Reverse Engineering Clay experiment into a Clay-native operating method.
+This playbook translates the AI GTM Enrichment Pipeline into a Clay-native operating method.
 
 The server-era project proved the pattern with Cloud Run, n8n, Postgres, and Gemini. The Clay-native version should not rebuild that infrastructure. It should use Clay's table, enrichment, waterfall, formula, and AI-column primitives to preserve the same stage-contract discipline inside a workbook.
 
