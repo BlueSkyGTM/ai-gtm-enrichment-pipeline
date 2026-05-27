@@ -6,7 +6,7 @@ This is the V1 archive of the AI GTM Enrichment Pipeline.
 
 ## What This Repo Is
 
-A single-file Node.js orchestrator managing three specialized AI agents — Ahab, Nemo, Neptune — over a self-hosted stack of Postgres, n8n, and Docker on GCP. Stress-tested to 1,500 enrichment cycles across 45 days. This repo is a closed, documented archive of that build.
+A single-file Node.js orchestrator managing three specialized AI agents — Ahab, Nemo, Neptune — over a self-hosted stack of Postgres, n8n, and Docker on GCP. Ran six campaigns over 45 days, resolved 18 documented failure modes, and produced hundreds of enriched leads across GTM, accounting, and research verticals. This repo is a closed, documented archive of that build.
 
 ---
 

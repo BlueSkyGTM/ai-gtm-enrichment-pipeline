@@ -1,6 +1,6 @@
 # AI GTM Enrichment Pipeline — V1
 
-A single-file Node.js orchestrator managing three specialized AI agents over a self-hosted stack of Postgres, n8n, and Docker on GCP. Stress-tested to 1,500 enrichment cycles across 45 days. Resolved 18 documented failure modes. Produced 500+ enriched leads across six campaigns.
+A single-file Node.js orchestrator managing three specialized AI agents over a self-hosted stack of Postgres, n8n, and Docker on GCP. Ran six campaigns over 45 days. Resolved 18 documented failure modes. Produced hundreds of enriched leads across GTM, accounting, and research verticals, staged for Clay handoff.
 
 ---
 
@@ -104,7 +104,7 @@ Deterministic by company name. The ON CONFLICT clause protects Enriched and Fini
 
 ## Campaigns
 
-Six campaigns ran across 45 days:
+Six campaigns ran over a 45-day period:
 
 | Campaign | Output Table | Schedule |
 |---|---|---|
@@ -119,14 +119,13 @@ Six campaigns ran across 45 days:
 
 ## Stress Test Results
 
-- **1,500 enrichment cycles** across 45 days
 - **18 documented failure modes** — all resolved (see `system_files/CHANGELOG.md` and `changelog.html`)
-- **500+ leads** enriched and staged for Clay handoff
-- **6 campaigns** running concurrently on separate schedules
+- **6 campaigns** running concurrently on separate schedules over 45 days
+- **Hundreds of enriched leads** across GTM, accounting, and research verticals, staged for Clay handoff
 
 Failure modes spanned: null payload routing, JSONB serialization bugs, ON CONFLICT logic errors, prompt output drift, schema gaps, dead code in session_id handlers, race conditions between status writes, and invisible failure paths in Nemo and Neptune catch blocks.
 
-Every failure mode is documented forensically in `system_files/CHANGELOG.md`: what broke, why it broke, and exactly what was changed to fix it. This is the primary portfolio artifact from V1.
+Every failure mode is documented forensically in `system_files/CHANGELOG.md`: what broke, why it broke, and exactly what was changed to fix it. The 18 failures are the primary portfolio artifact from V1 — they prove the build was real.
 
 ---
 
