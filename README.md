@@ -20,6 +20,30 @@ Discovery → Diagnostic Enrichment → Outreach Synthesis → Clay Handoff
 
 ---
 
+## The Agents
+
+| Agent | Persona | Model | Grounding | Role |
+|---|---|---|---|---|
+| Ahab | The Hunter | Gemini 2.5 Flash | Google Search | High-volume discovery — scrapes, filters aggregators, seeds Postgres |
+| Nemo | The Intelligence Analyst | Gemini 2.5 Pro | Google Search | Single-lead forensic enrichment — friction diagnosis, contact recon, SHIPWRECKED routing |
+| Neptune | The Authority Engine | Gemini 2.5 Pro | None | Outreach synthesis — converts friction profile into a Schwartz-style Bite |
+
+Each agent has a dedicated system prompt defined inline in `server.js` (`AHAB_SYSTEM`, `NEMO_SYSTEM`, `NEPTUNE_SYSTEM`). The prompts encode persona, output contract, failure behavior, and voice constraints — everything that determines how the agent reasons, not just what it returns.
+
+**Further documentation:**
+
+| Document | What it contains |
+|---|---|
+| `server.js` | All three agent prompts inline — the canonical source of truth for agent behavior |
+| `framework/prompts/` | Standalone YAML versions of each system prompt |
+| `framework/agents/archive/` | Base agent definitions — early-stage persona and directive drafts |
+| `framework/prompt_library/` | Campaign-specific prompt configs — how each campaign targets and filters |
+| `framework/api/agent_platform_call.md` | Agent Platform API call structure — request format, auth, grounding config per agent |
+| `RECONSTRUCTION.md` | Complete system rebuild guide — teaches the full architecture cold |
+| `system_files/CHANGELOG.md` | 18 failure modes — what broke in each agent, why, and exactly what was changed |
+
+---
+
 ## Architecture
 
 ### The Pull Model
