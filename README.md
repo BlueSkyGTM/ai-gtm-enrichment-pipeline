@@ -1,245 +1,164 @@
-# AI GTM Enrichment Pipeline
+# AI GTM Enrichment Pipeline — V1
 
-An AI GTM enrichment system that turns public market signals into governed, CRM-ready payloads through staged agents, structured QA, and clean handoff contracts.
+A single-file Node.js orchestrator managing three specialized AI agents over a self-hosted stack of Postgres, n8n, and Docker on GCP. Stress-tested to 1,500 enrichment cycles across 45 days. Resolved 18 documented failure modes. Produced 500+ enriched leads across six campaigns.
 
-The architecture focuses on the operational layer where AI strategy becomes useful GTM execution: source discovery, diagnostic enrichment, model-output governance, failure visibility, and final payload design for Clay, HubSpot, or downstream revenue workflows.
+---
 
-## Core Thesis
+## What This Pipeline Does
 
-Generic enrichment answers are cheap. Durable enrichment requires stage contracts.
+The pipeline converts a campaign message string into a CRM-ready enriched lead record through three sequential agent stages:
 
-This system demonstrates that enrichment quality improves when the workflow becomes a shared context surface. Each stage writes a small, durable payload that later stages can inherit instead of restarting from raw web context.
-
-```text
-Clay columns are not just lookups.
-They can be memory-bearing handoffs.
+```
+Discovery → Diagnostic Enrichment → Outreach Synthesis → Clay Handoff
 ```
 
-The server architecture used Postgres for that shared context surface. A Clay-native version can use the table itself.
+**Ahab** (The Hunter) finds companies. Given a campaign target profile, Ahab runs grounded web searches against job boards, LinkedIn, and company signals. It filters aggregators, deduplicates by company name, and writes one Postgres row per lead with `status='Scraped'`.
 
-## What The System Demonstrates
+**Nemo** (The Intelligence Analyst) enriches companies forensically. Nemo reads Ahab's payload, performs a second round of grounded research, and diagnoses the company against a four-archetype friction framework: API Stutter, Scale Friction, Manual Data Debt, or Displacement Signal. It writes contact recon, funding signals, and a structured enrichment payload with `status='Enriched'` — or routes failures to `fleet_errors` with `status='Shipwrecked'`.
 
-The pipeline used Google Cloud, n8n, Postgres, and Gemini as a runtime stack to validate the design patterns behind reliable AI-assisted enrichment:
+**Neptune** (The Authority Engine) synthesizes the outreach message. Neptune reads Nemo's payload and produces a Robert Collier-style outreach Bite — grounded in the specific friction pattern observed, written from the voice of a researcher who spent 200 hours studying GTM failure patterns, never from an advisor or consultant. Output is a `status='Finished'` row with `outreach_bite` ready for Clay or a sequencing tool.
 
-- Lead workflows need stage contracts, not one giant prompt.
-- Workflow tools should pass stable identifiers instead of heavy AI payloads.
-- Grounded search is useful for discovery when strict filters protect against job-board noise.
-- AI output needs contracts, fallback behavior, parser recovery, and failure visibility.
-- Later enrichments are more useful when they inherit structured judgment from earlier stages.
-- The final value is a trustworthy GTM payload that can move into Clay, HubSpot, or a sequencing tool with clean state.
+---
 
-## System Overview
+## The Agents
 
-The pipeline has three core stages:
+| Agent | Persona | Model | Grounding | Role |
+|---|---|---|---|---|
+| Ahab | The Hunter | Gemini 2.5 Flash | Google Search | High-volume discovery — scrapes, filters aggregators, seeds Postgres |
+| Nemo | The Intelligence Analyst | Gemini 2.5 Pro | Google Search | Single-lead forensic enrichment — friction diagnosis, contact recon, SHIPWRECKED routing |
+| Neptune | The Authority Engine | Gemini 2.5 Pro | None | Outreach synthesis — converts friction profile into a Schwartz-style Bite |
 
-```text
-Discovery -> Diagnostic Enrichment -> Final Payload
+Each agent has a dedicated system prompt defined inline in `server.js` (`AHAB_SYSTEM`, `NEMO_SYSTEM`, `NEPTUNE_SYSTEM`). The prompts encode persona, output contract, failure behavior, and voice constraints — everything that determines how the agent reasons, not just what it returns.
+
+**Further documentation:**
+
+| Document | What it contains |
+|---|---|
+| `server.js` | All three agent prompts inline — the canonical source of truth for agent behavior |
+| `framework/prompts/` | Standalone YAML versions of each system prompt |
+| `framework/agents/archive/` | Base agent definitions — early-stage persona and directive drafts |
+| `framework/prompt_library/` | Campaign-specific prompt configs — how each campaign targets and filters |
+| `framework/api/agent_platform_call.md` | Agent Platform API call structure — request format, auth, grounding config per agent |
+| `RECONSTRUCTION.md` | Complete system rebuild guide — teaches the full architecture cold |
+| `system_files/CHANGELOG.md` | 18 failure modes — what broke in each agent, why, and exactly what was changed |
+
+---
+
+## Architecture
+
+### The Pull Model
+
+The first iteration pushed full payloads through n8n nodes. That design broke under load: node memory limits capped batch sizes, any failure lost the payload entirely, and nothing was queryable mid-pipeline.
+
+The V1 architecture is a Pull Model. n8n acts as a scheduler and traffic controller only. It passes a single `session_id` string between nodes — never lead data. Each agent reads its own input from Postgres and writes its output back to Postgres. The database is the shared context surface.
+
+```
+Cloud Scheduler → n8n → [session_id] → Ahab → Postgres
+                          [session_id] → Nemo  → Postgres
+                          [session_id] → Neptune → Postgres → Clay
 ```
 
-The infrastructure around those stages:
+This means:
+- Failures are recoverable — re-run any agent with the same `session_id`
+- Every stage is independently queryable in Retool
+- Batch size is limited only by Ahab's token ceiling, not n8n memory
+- The `/api/reprocess` endpoint can re-run Neptune on any lead independently
 
-```text
-Cloud Scheduler -> n8n -> fleet-agents API -> Postgres -> Retool
+### Single-File Orchestrator
+
+All agent logic — prompts, response schemas, Postgres queries, error handling, parser recovery, and routing — lives in a single file: `server.js`. No abstraction layers, no shared modules between agents, no framework. Each agent is a self-contained Express route. This was the design choice that made the failure modes visible and addressable.
+
+### Stack
+
+| Component | Detail |
+|---|---|
+| Orchestrator | `server.js` — Express, hosted on Cloud Run (`fleet-agents`) |
+| Database | Postgres 15 (`nocodb_data`), Cloud SQL, private IP via Direct VPC Egress |
+| Scheduler | Cloud Scheduler → n8n (Cloud Run) → `fleet-agents` HTTP |
+| AI Models | Gemini 2.5 Flash (Ahab), Gemini 2.5 Pro (Nemo, Neptune) via Agent Platform |
+| Visibility | Retool — read-only UI over Postgres |
+| Containerization | Docker — n8n and app containers defined in `system_files/infra/docker/` |
+
+### session_id
+
+Generated server-side by Ahab on INSERT:
+
+```js
+const session_id = 'lead_' + company_name.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase();
 ```
 
-n8n acts as traffic control. It triggers the workflow and passes stable identifiers. The server and database handle enrichment state, model output, parser recovery, and inspection.
+Deterministic by company name. The ON CONFLICT clause protects Enriched and Finished rows from being reset by nightly re-runs — the DO UPDATE clause only fires when `status = 'Scraped'`.
 
-## Core Architecture Decision: Pull Model
+---
 
-The first version pushed full payloads through n8n. That design created brittle handoffs because every node carried too much context: source URLs, company notes, research strings, model logs, contacts, health signals, and partial output fields. Payloads grew, expressions broke, and downstream model calls received polluted context.
+## Campaigns
 
-The system moved to a pull model:
+Six campaigns ran across 45 days:
 
-```text
-Discovery writes payload to Postgres
-n8n passes session_id
-Enrichment reads by session_id and writes structured payload
-n8n passes session_id
-Final render reads by session_id and writes final output
+| Campaign | Output Table | Schedule |
+|---|---|---|
+| GTM Career Hunt | `gtm_career_leads` | Daily 2AM |
+| GTM Upwork Hunt | `gtm_upwork_leads` | Daily 6AM |
+| Accountant Career Hunt | `accountant_career_leads` | Daily 4AM |
+| Accountant Bulk Enrichment | `accountant_bulk_leads` | Weekly Mon 3AM |
+| Accountant Upwork Hunt | `accountant_upwork_leads` | Daily 7AM |
+| Researcher Career Hunt | `researcher_career_leads` | Daily 2:30AM |
+
+---
+
+## Stress Test Results
+
+- **1,500 enrichment cycles** across 45 days
+- **18 documented failure modes** — all resolved (see `system_files/CHANGELOG.md` and `changelog.html`)
+- **500+ leads** enriched and staged for Clay handoff
+- **6 campaigns** running concurrently on separate schedules
+
+Failure modes spanned: null payload routing, JSONB serialization bugs, ON CONFLICT logic errors, prompt output drift, schema gaps, dead code in session_id handlers, race conditions between status writes, and invisible failure paths in Nemo and Neptune catch blocks.
+
+Every failure mode is documented forensically in `system_files/CHANGELOG.md`: what broke, why it broke, and exactly what was changed to fix it. This is the primary portfolio artifact from V1.
+
+---
+
+## What V1 Discovered
+
+**Clay is the superior native enrichment layer downstream.**
+
+The V1 stack validated the design patterns that make AI enrichment reliable: stage contracts, pull-model state management, typed output schemas, parser recovery, and failure visibility. But the infrastructure cost of maintaining those patterns over a self-hosted stack — Cloud Run, Cloud SQL, VPC, n8n, Retool, Docker — is high. Every architectural decision that looked like flexibility was actually a maintenance surface.
+
+Clay implements the same stage-contract discipline natively, inside a workbook, without the infrastructure. A Clay table column is a memory-bearing handoff. The same pattern that required a Postgres row + session_id in V1 becomes a Clay enrichment column in V2.
+
+**Single-file orchestration over open-source middleware is an unsustainable execution environment.**
+
+`server.js` being a single file made the failure modes visible and fixed them faster than a modular architecture would have. But n8n's internal state, Cloud Run cold starts, VPC connector instability, and the coordination overhead between six independent systems created a fragile execution layer. The architecture proved the thesis. It did not prove it could scale without breaking.
+
+---
+
+## Repository Structure
+
+```
+server.js                          ← Single-file orchestrator (all three agent prompts inline)
+system_files/
+  CHANGELOG.md                     ← 18 failure modes — forensic record
+  src/
+    agents/                        ← Ahab, Nemo, Neptune agent modules
+    utils/                         ← db.js, parser.py, python.js, gemini.js, prompts.js
+    workers/                       ← shark-worker.js
+  infra/docker/                    ← Dockerfile.n8n, docker-compose.yml, service YAML
+  install/                         ← Dockerfile, package.json, deploy.sh
+framework/
+  prompts/                         ← Current system prompts (ahab, nemo, neptune)
+  agents/archive/                  ← Base agent YAML definitions
+  prompt_library/                  ← Campaign-specific prompt configs
+  api/                             ← Agent Platform API call structure
+  schema/                          ← Campaign table SQL template
+RECONSTRUCTION.md                  ← Complete system rebuild guide
+DECISIONS.md                       ← Locked architecture decisions with rationale
+changelog.html                     ← Rendered architecture log (portfolio artifact)
+index.html                         ← Pipeline overview (portfolio artifact)
 ```
 
-This reduced handoffs to a stable key and made every stage independently inspectable.
+---
 
-## Discovery: Search Filtering
+## Forward Pointer
 
-The discovery stage finds companies with active GTM, RevOps, MarOps, automation, or AI workflow signals.
-
-Key behaviors:
-
-- Used Gemini with Google Search grounding to reach live web evidence.
-- Searched from role and campaign instructions rather than a static lead list.
-- Used job-posting search patterns to reach company career pages and relevant openings.
-- Filtered job-board aggregators such as Indeed, LinkedIn Jobs, Glassdoor, Jobgether, Jobsora, and ZipRecruiter.
-- Generated deterministic `session_id` values from company names.
-- Wrote one row per company to Postgres with `status = 'Scraped'`.
-
-Grounded search plus strict company filtering turns noisy public hiring surfaces into structured GTM inputs.
-
-Relevant files:
-
-- `system_files/src/agents/ahab.js`
-- `agent_framework/prompts/ahab_system.yaml`
-- `n8n_pipelines/WORKFLOW_BUILDER.md`
-
-## Diagnostic Enrichment
-
-The enrichment stage reads a stored discovery payload and produces a structured enrichment object. The work is diagnostic, not generic enrichment: the system classifies operational friction into reusable categories.
-
-| Friction type | Meaning |
-|---------------|---------|
-| `API Stutter` | Tools exist but do not communicate cleanly |
-| `Scale Friction` | Growth is outpacing operational infrastructure |
-| `Manual Data Debt` | Humans are doing work that should be automated |
-| `Displacement Signal` | A company is paying for a tool or role that points to a better system-level fix |
-
-It also handles disqualification. If a funding or growth signal is stale, the row can be marked `Shipwrecked` instead of being pushed forward as a false positive.
-
-Relevant files:
-
-- `system_files/src/agents/nemo.js`
-- `agent_framework/prompts/nemo_system.yaml`
-- `system_files/src/utils/parser.js`
-- `system_files/src/utils/parser.py`
-
-## Parser Layer
-
-The parser layer is the practical bridge between n8n, model output, and server code.
-
-`parser.py` normalizes n8n payloads into a smaller shape the server can reliably process:
-
-```json
-{
-  "session_id": "lead_example_company",
-  "company_name": "Example Company",
-  "email": null,
-  "friction_type": "API Stutter"
-}
-```
-
-`parser.js` handles runtime cleanup:
-
-- Strips citation markers such as `[1]` and `[2, 3]`.
-- Rejects Vertex AI grounding redirect URLs.
-- Extracts valid JSON from markdown-wrapped model output.
-- Locates friction and funding signals across inconsistent model output paths.
-- Normalizes contact payloads without corrupting JSONB.
-
-The parser layer exposes the real production gap between "the model produced something" and "the workflow can safely use it."
-
-## Final Payload Synthesis
-
-The final render stage reads the enriched record and produces the handoff payload.
-
-The useful pattern is that a final render stage should receive a narrow, validated brief rather than the full research context. This stage validates whether funding, friction type, contact context, and service intent are enough to produce specific human-facing language and a CRM-ready next-step payload.
-
-Relevant files:
-
-- `system_files/src/agents/neptune.js`
-- `agent_framework/prompts/neptune_system.yaml`
-- `agent_framework/agents/stage_contracts.md`
-
-## Stage Contracts
-
-The stage-contract document is the spine of the project. It defines what each stage must receive, what it must produce, and what the next stage can assume.
-
-Agent workflows fail when every step receives "everything." Stage contracts force each stage to expose only the fields downstream work needs.
-
-Key contract ideas:
-
-- Discovery can be skipped if a pre-sourced list satisfies the enrichment minimum input.
-- Enrichment must produce a structured `Enriched_Lead`.
-- The final render stage should not receive raw discovery output.
-- A deterministic handoff layer can strip full enrichment into a minimal brief.
-
-Relevant file:
-
-- `agent_framework/agents/stage_contracts.md`
-
-## n8n's Role
-
-n8n is deliberately not the intelligence layer.
-
-Its job:
-
-- Trigger the workflow.
-- Send the campaign message or seed list.
-- Parse returned `session_id` values.
-- Call the next stages with only `session_id`.
-
-Its non-job:
-
-- Carry full lead payloads.
-- Transform model outputs.
-- Hold business logic.
-- Decide enrichment strategy.
-
-That division keeps orchestration separate from enrichment intelligence. If n8n can be reduced to handoffs, Clay columns can become the handoffs.
-
-Relevant files:
-
-- `n8n_pipelines/WORKFLOW_BUILDER.md`
-- `n8n_pipelines/WORKFLOW_USAGE.md`
-
-## Failure Modes Resolved
-
-The system is useful because failures were documented and designed around.
-
-Important fixes included:
-
-- Aggregator companies being mistaken for target accounts.
-- Vertex AI redirect URLs being stored instead of real company domains.
-- Model citations polluting string fields.
-- Contact JSON being stored incorrectly inside JSONB.
-- Enriched rows being reset to `Scraped` on reruns.
-- Stale leads briefly appearing alive.
-- Model truncation creating empty final output.
-- Stage failures being invisible without `fleet_errors`.
-
-Relevant file:
-
-- `system_files/CHANGELOG.md`
-
-## Clay-Native Translation
-
-The server stack validated the contracts. Clay is the natural operating surface for a GTM team that wants the same logic inside a table.
-
-The Clay-native design uses:
-
-- Clay tables with stable identifiers.
-- One job per AI column.
-- Waterfall enrichment with cost gates.
-- Forensic signal columns.
-- A compact handoff column.
-- A final payload/render column.
-- HubSpot-ready export fields and QA gates.
-
-That design is documented in:
-
-- `CLAY_PLAYBOOK.md`
-
-## Reviewer Path
-
-If you are reviewing this project for a GTM Engineering, RevOps, MarOps, Marketing Automation, or AI Workflow Strategy role, read in this order:
-
-1. `README.md` -- architecture story and why it matters.
-2. `agent_framework/agents/stage_contracts.md` -- input/output contracts.
-3. `system_files/src/utils/parser.py` -- n8n-to-server normalization.
-4. `system_files/src/utils/parser.js` -- cleanup and extraction layer.
-5. `system_files/src/agents/ahab.js` -- grounded discovery and aggregator filtering.
-6. `system_files/src/agents/nemo.js` -- diagnostic enrichment stage.
-7. `system_files/src/agents/neptune.js` -- final synthesis stage.
-8. `CLAY_PLAYBOOK.md` -- Clay-native translation.
-
-## Role Fit
-
-This project is relevant to:
-
-- GTM Engineering
-- RevOps and Marketing Operations
-- AI Workflow Architecture
-- Automation Strategy
-- CRM Operations
-- Clay builder / enrichment systems roles
-- Data-driven growth operations
-
-The code exists to prove systems thinking in the operating layer: clean handoffs, CRM-ready payloads, enrichment discipline, context control, model-output QA, and failure visibility.
+This pipeline identified the limits of self-hosted orchestration and discovered Clay as the superior native enrichment layer. The architectural lessons from this build are the foundation of the V2 rebuild — agentic-gtm-mcp — which eliminates the self-hosted infrastructure entirely and routes enrichment through Cloud-native tooling, MCP delivery, and shared agent memory.
