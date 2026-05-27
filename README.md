@@ -20,6 +20,16 @@ Discovery → Diagnostic Enrichment → Outreach Synthesis → Clay Handoff
 
 ---
 
+## The Single-File Orchestrator
+
+`server.js` at the repo root is the central artifact of V1.
+
+All three agent system prompts (`AHAB_SYSTEM`, `NEMO_SYSTEM`, `NEPTUNE_SYSTEM`), all payload utility functions (`extractFrictionType`, `normalizeNemoPayload`, `sanitizeDirectUrl`, `stripCitations`, `extractFundingSignal`), and all route logic (`/api/ahab`, `/api/nemo`, `/api/neptune`, `/api/seed`, `/api/reprocess`, `/api/requeue`) live in one file by design.
+
+This was a deliberate V1 architectural choice. Keeping everything in one file made every failure mode immediately visible and addressable — there was no abstraction layer to hide the breakage. It also made the limitations of the design undeniable. When a single file is handling prompt logic, database writes, error routing, and API calls for three agents simultaneously, the ceiling of that approach becomes clear quickly. That ceiling is what motivated V2.
+
+---
+
 ## The Agents
 
 | Agent | Persona | Model | Grounding | Role |
@@ -39,7 +49,8 @@ Each agent has a dedicated system prompt defined inline in `server.js` (`AHAB_SY
 | `framework/agents/archive/` | Base agent definitions — early-stage persona and directive drafts |
 | `framework/prompt_library/` | Campaign-specific prompt configs — how each campaign targets and filters |
 | `framework/api/agent_platform_call.md` | Agent Platform API call structure — request format, auth, grounding config per agent |
-| `RECONSTRUCTION.md` | Complete system rebuild guide — teaches the full architecture cold |
+| `ARCHITECTURE.md` | Repo map — data flow, pull model, where each agent lives |
+| `REFERENCES.md` | Agent output contracts and Forensic Dictionary definitions |
 | `system_files/CHANGELOG.md` | 18 failure modes — what broke in each agent, why, and exactly what was changed |
 
 ---
@@ -151,14 +162,16 @@ framework/
   prompt_library/                  ← Campaign-specific prompt configs
   api/                             ← Agent Platform API call structure
   schema/                          ← Campaign table SQL template
-RECONSTRUCTION.md                  ← Complete system rebuild guide
-DECISIONS.md                       ← Locked architecture decisions with rationale
+CLAUDE.md                          ← AI orientation file — boundaries, key files, V2 pointer
+ARCHITECTURE.md                    ← Repo map for reviewers landing cold
+REFERENCES.md                      ← Agent output contracts and Forensic Dictionary
+CLAY_PLAYBOOK.md                   ← Downstream Clay handoff design
 changelog.html                     ← Rendered architecture log (portfolio artifact)
 index.html                         ← Pipeline overview (portfolio artifact)
 ```
 
 ---
 
-## Forward Pointer
+## What Came Next
 
-This pipeline identified the limits of self-hosted orchestration and discovered Clay as the superior native enrichment layer. The architectural lessons from this build are the foundation of the V2 rebuild — agentic-gtm-mcp — which eliminates the self-hosted infrastructure entirely and routes enrichment through Cloud-native tooling, MCP delivery, and shared agent memory.
+This pipeline stress-tested the agent logic and identified the limits of self-hosted orchestration. The infrastructure — Postgres, n8n, Docker — was the failure domain, not the agents. The V2 rebuild, agentic-gtm-mcp, eliminates that environment entirely and routes enrichment through Cloud-native tooling, MCP delivery, and shared agent memory. View V2 →
